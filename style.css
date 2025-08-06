@@ -2045,6 +2045,8 @@ border: 2px solid var(--color-border);
     color: #000;
 }
 
+
+
 /* Login Modal Specific */
 .login-modal-content {
     text-align: center;
@@ -2087,6 +2089,7 @@ border: 2px solid var(--color-border);
     margin-left: 6px;
     font-style: italic;
 }
+
 
 
 /* Default hidden for mobile menu */
@@ -2152,3 +2155,7 @@ border: 2px solid var(--color-border);
   text-decoration: none;
 }
 
+body.dark .login-modal-title,
+[data-color-scheme="dark"] .login-modal-title {
+  color: #000000 !important;
+}
