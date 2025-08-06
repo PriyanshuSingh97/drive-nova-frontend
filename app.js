@@ -1,6 +1,4 @@
-const API_BASE_URL = "https://drivenova-backend.onrender.com";
-const AUTH_BTN_ID = 'auth-btn';
-const USER_HEADER_ID = 'user-header';
+const API_BASE_URL = "https://your-render-backend-url.onrender.com"; // <-- Replace with your Render backend URL
 
 let currentFilter = 'all';
 let currentSelectedCar = null;
