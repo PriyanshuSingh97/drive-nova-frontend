@@ -1,8 +1,53 @@
-const API_BASE_URL = "https://drivenova-backend.onrender.com"; // <-- Replace with your Render backend URL
+// ===== STORE JWT TOKEN IMMEDIATELY ON PAGE LOAD (before anything else!) =====
+(function saveTokenFromUrlImmediately() {
+  const m = window.location.search.match(/[?&]token=([^&]+)/);
+  if(m) {
+    localStorage.setItem('jwt_token', m[1]);
+    const p = new URLSearchParams(window.location.search);
+    p.delete('token');
+    window.history.replaceState({}, document.title, window.location.pathname + (p.toString() ? `?${p}` : ''));
+  }
+})();
+
+const API_BASE_URL = "https://drivenova-backend.onrender.com";
 
 let currentFilter = 'all';
 let currentSelectedCar = null;
 let isDarkMode = false;
+
+// === AUTH HELPERS ===
+function authHeaders() {
+  const token = localStorage.getItem('jwt_token');
+  return token ? { 'Authorization': 'Bearer ' + token } : {};
+}
+function isUserLoggedIn() {
+  return !!localStorage.getItem('jwt_token');
+}
+function logout() {
+  localStorage.removeItem('jwt_token');
+  location.reload();
+}
+
+// === RENDERS NAV AUTH BUTTON ===
+function renderAuthButtons() {
+  const nav = document.querySelector('.nav__controls');
+  if (!nav) return;
+  nav.innerHTML = '';
+  if (isUserLoggedIn()) {
+    const logoutBtn = document.createElement('button');
+    logoutBtn.textContent = 'Logout';
+    logoutBtn.className = 'btn btn--primary btn-nav-login';
+    logoutBtn.onclick = logout;
+    nav.appendChild(logoutBtn);
+  } else {
+    // Google Login button (in nav, not modal)
+    const a = document.createElement('a');
+    a.href = API_BASE_URL + "/api/auth/google";
+    a.className = "btn btn--primary btn-nav-login";
+    a.innerHTML = `<img src="https://developers.google.com/identity/images/g-logo.png" style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
+    nav.appendChild(a);
+  }
+}
 
 // ===== INIT APP =====
 document.addEventListener('DOMContentLoaded', function () {
@@ -13,6 +58,8 @@ document.addEventListener('DOMContentLoaded', function () {
   setDefaultDates();
   setupScrollAnimations();
   setupSearch('hero-search-input', 'hero-search-results', 'hero-search-button');
+  renderAuthButtons();
+  setupLoginModalEvents();
 });
 
 // ===== FETCH CARS FROM BACKEND (MongoDB Atlas) =====
@@ -20,11 +67,9 @@ async function fetchAndRenderCars(filter = 'all') {
   try {
     const res = await fetch(`${API_BASE_URL}/api/cars`);
     const cars = await res.json();
-
     const carsContainer = document.getElementById('cars-container');
     if (!carsContainer) return;
     carsContainer.innerHTML = '';
-
     const filteredCars = (filter === 'all') ? cars : cars.filter(car => car.category === filter);
     filteredCars.forEach((car, index) => {
       const card = createCarCard(car);
@@ -65,6 +110,10 @@ function setupEventListeners() {
   // Car booking button click
   document.getElementById('cars-container')?.addEventListener('click', (e) => {
     if (e.target.classList.contains('car-card__book')) {
+      if (!isUserLoggedIn()) {
+        showPopupMessage("Please login to book a car.");
+        return;
+      }
       const name = e.target.getAttribute('data-car-name');
       const price = parseInt(e.target.getAttribute('data-car-price')) || 0;
       openBookingModal(name, price);
@@ -119,9 +168,28 @@ function setupEventListeners() {
   }
 }
 
+// ===== LOGIN MODAL EVENTS (in case you ever want to re-enable modal login) =====
+function setupLoginModalEvents() {
+  var modalClose = document.getElementById('login-modal-close');
+  var modalOverlay = document.querySelector('#login-modal .modal__overlay');
+  if(modalClose) modalClose.addEventListener('click', closeLoginModal);
+  if(modalOverlay) modalOverlay.addEventListener('click', closeLoginModal);
+
+  var googleBtn = document.getElementById('google-login');
+  if(googleBtn) {
+    googleBtn.addEventListener('click', function() {
+      window.location.href = API_BASE_URL + "/api/auth/google";
+    });
+  }
+}
+
 // ===== BOOKING FORM SUBMIT (MongoDB) =====
 async function handleBookingSubmit(e) {
   e.preventDefault();
+  if (!isUserLoggedIn()) {
+    showPopupMessage("Please login to book a car.");
+    return;
+  }
   const form = e.target;
   const formData = new FormData(form);
   const bookingData = Object.fromEntries(formData);
@@ -134,7 +202,10 @@ async function handleBookingSubmit(e) {
   try {
     const res = await fetch(`${API_BASE_URL}/api/bookings`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
       body: JSON.stringify(bookingData),
     });
 
@@ -145,6 +216,7 @@ async function handleBookingSubmit(e) {
       closeBookingModal();
       showPopupMessage("Booking Confirmed! We'll contact you shortly.");
     } else {
+      if (res.status === 401) { logout(); }
       formStatus.textContent = 'Booking failed. Please try again.';
       formStatus.style.color = '#dc3545';
     }
@@ -361,33 +433,12 @@ function scrollToCar(name) {
   });
 }
 
-// ==========================
-// Login Modal Functionality
-// ==========================
+// ==== LOGIN MODAL SUPPORT (optional, safe to ignore if not visible) ====
 function openLoginModal() {
   document.getElementById('login-modal').classList.add('visible');
 }
 function closeLoginModal() {
   document.getElementById('login-modal').classList.remove('visible');
+
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  var btnDesktop = document.getElementById('login-btn');
-  var btnMobile = document.getElementById('login-btn-mobile');
-  if (btnDesktop) btnDesktop.addEventListener('click', function(e) { e.preventDefault(); openLoginModal(); });
-  if (btnMobile) btnMobile.addEventListener('click', function(e) { e.preventDefault(); openLoginModal(); });
-
-  // Close modal when clicking close button or overlay
-  var modalClose = document.getElementById('login-modal-close');
-  var modalOverlay = document.querySelector('#login-modal .modal__overlay');
-  if(modalClose) modalClose.addEventListener('click', closeLoginModal);
-  if(modalOverlay) modalOverlay.addEventListener('click', closeLoginModal);
-
-  // Google login logic
-  var googleBtn = document.getElementById('google-login');
-  if(googleBtn) {
-    googleBtn.addEventListener('click', function() {
-      window.location.href = API_BASE_URL + "/api/auth/google";
-    });
-  }
-});
