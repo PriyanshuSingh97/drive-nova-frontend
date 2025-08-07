@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
   renderAuthButtons();
   renderMobileAuthButton();
   setupLoginModalEvents();
+  setupMobileNavScroll(); // <---- add custom mobile nav scroll
 });
 
 // ===== FETCH CARS FROM BACKEND =====
@@ -192,6 +193,33 @@ function setupEventListeners() {
       });
     });
   }
+}
+
+// ===== MOBILE NAV LINK SCROLL LOGIC (ONLY FOR MOBILE) =====
+function setupMobileNavScroll() {
+  function isMobile() {
+    // Feel free to adjust the width as per your mobile breakpoint
+    return window.innerWidth <= 768;
+  }
+  function getHeaderHeight() {
+    // Adjust if your mobile header height changes, or get dynamically
+    const header = document.getElementById('header');
+    return header ? header.offsetHeight : 60;
+  }
+  document.querySelectorAll('#nav-menu-mobile .nav__link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const hash = link.getAttribute('href');
+      if (hash && hash.startsWith('#') && isMobile()) {
+        const section = document.querySelector(hash);
+        if (section) {
+          e.preventDefault();
+          // Compute correct offset (header height)
+          const y = section.getBoundingClientRect().top + window.pageYOffset - getHeaderHeight();
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }
+    });
+  });
 }
 
 // ===== LOGIN MODAL EVENTS (for completeness) =====
