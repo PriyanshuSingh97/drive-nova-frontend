@@ -28,7 +28,7 @@ function logout() {
   location.reload();
 }
 
-// === RENDERS NAV AUTH BUTTON ===
+// === RENDERS NAV AUTH BUTTON (DESKTOP) ===
 function renderAuthButtons() {
   const nav = document.querySelector('.nav__controls');
   if (!nav) return;
@@ -49,6 +49,33 @@ function renderAuthButtons() {
   }
 }
 
+// === RENDERS MOBILE NAV LOGIN/LOGOUT BUTTON ===
+function renderMobileAuthButton() {
+  const mobileLoginLi = document.getElementById('nav-menu-mobile-login');
+  if (!mobileLoginLi) return;
+  mobileLoginLi.innerHTML = '';
+
+  if (isUserLoggedIn()) {
+    const logoutBtn = document.createElement('button');
+    logoutBtn.textContent = 'Logout';
+    logoutBtn.className = 'btn btn--primary btn-nav-login mobile-login';
+    logoutBtn.onclick = function () {
+      logout();
+      // Close hamburger after logout (safe)
+      document.getElementById('nav-menu-mobile').classList.remove('active');
+      document.getElementById('nav-hamburger').classList.remove('active');
+    };
+    mobileLoginLi.appendChild(logoutBtn);
+  } else {
+    // Google Login
+    const loginBtn = document.createElement('a');
+    loginBtn.href = API_BASE_URL + "/api/auth/google";
+    loginBtn.className = 'btn btn--primary btn-nav-login mobile-login';
+    loginBtn.innerHTML = `<img src="https://developers.google.com/identity/images/g-logo.png" style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
+    mobileLoginLi.appendChild(loginBtn);
+  }
+}
+
 // ===== INIT APP =====
 document.addEventListener('DOMContentLoaded', function () {
   initializeTheme();
@@ -59,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setupScrollAnimations();
   setupSearch('hero-search-input', 'hero-search-results', 'hero-search-button');
   renderAuthButtons();
+  renderMobileAuthButton();
   setupLoginModalEvents();
 });
 
@@ -159,6 +187,7 @@ function setupEventListeners() {
     hamburger.addEventListener('click', function () {
       this.classList.toggle('active');
       navMenuMobile.classList.toggle('active');
+      renderMobileAuthButton();
     });
     document.querySelectorAll('#nav-menu-mobile .nav__link').forEach(link => {
       link.addEventListener('click', () => {
@@ -228,12 +257,14 @@ async function handleBookingSubmit(e) {
       form.reset();
       closeBookingModal();
       showPopupMessage("Booking Confirmed! We'll contact you shortly.");
+      renderMobileAuthButton(); // update Login/Logout in hamburger after booking
+      renderAuthButtons(); // In case login state has changed (edge-case)
     } else {
       if (res.status === 401) { logout(); }
       let errText = 'Booking failed. Please try again.';
       try {
         errText = (await res.json()).message || errText;
-      } catch(e) {}
+      } catch (e) { }
       formStatus.textContent = errText;
       formStatus.style.color = '#dc3545';
     }
