@@ -27,24 +27,11 @@
 
       <!-- Desktop Navigation Links -->
       <ul class="nav__menu desktop-only" id="nav-menu-desktop">
-        <li class="nav__item">
-          <a href="#home" class="nav__link">Home</a>
-        </li>
-        <li class="nav__item">
-          <a href="#fleet" class="nav__link">Fleet</a>
-        </li>
-        <li class="nav__item">
-          <a href="#about" class="nav__link">About</a>
-        </li>
-        <li class="nav__item">
-          <a href="#contact" class="nav__link">Contact</a>
-        </li>
-        <!-- Desktop Login Button (add at end) -->
-        <li class="nav__item">
-          <a href="#" class="nav__link btn-nav-login" id="login-btn">Login</a>
-        </li>
+        <li class="nav__item"><a href="#home" class="nav__link">Home</a></li>
+        <li class="nav__item"><a href="#fleet" class="nav__link">Fleet</a></li>
+        <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
+        <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
       </ul>
-
       <!-- Desktop Theme Toggle -->
       <div class="nav__controls desktop-only">
         <div class="theme-toggle" id="theme-toggle">
@@ -52,33 +39,18 @@
           <label for="theme-switch" class="theme-toggle__label"></label>
         </div>
       </div>
-
       <!-- Mobile Theme Toggle (Top Right) -->
       <div class="theme-toggle mobile-only mobile-theme-toggle" id="mobile-theme-toggle">
         <input type="checkbox" id="mobile-theme-switch" class="theme-toggle__switch" />
         <label for="mobile-theme-switch" class="theme-toggle__label"></label>
       </div>
-
       <!-- Mobile Menu (nav links) - Hidden by default -->
       <ul class="nav__menu mobile-only" id="nav-menu-mobile">
-        <li class="nav__item">
-          <a href="#home" class="nav__link">Home</a>
-        </li>
-        <li class="nav__item">
-          <a href="#fleet" class="nav__link">Fleet</a>
-        </li>
-        <li class="nav__item">
-          <a href="#about" class="nav__link">About</a>
-        </li>
-        <li class="nav__item">
-          <a href="#contact" class="nav__link">Contact</a>
-        </li>
-        <!-- Mobile Login Button (add at end) -->
-        <li class="nav__item">
-          <a href="#" class="nav__link btn-nav-login" id="login-btn-mobile">Login</a>
-
-
-        </li>
+        <li class="nav__item"><a href="#home" class="nav__link">Home</a></li>
+        <li class="nav__item"><a href="#fleet" class="nav__link">Fleet</a></li>
+        <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
+        <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
+        <li class="nav__item"></li>
       </ul>
     </nav>
   </div>
@@ -137,7 +109,6 @@
                 <h2 class="section-title animate__animated animate__fadeInUp">Why Choose DriveNova?</h2>
                 <p class="section-description animate__animated animate__fadeInUp animate__delay-1s">Experience premium car rental services with unmatched quality</p>
             </div>
-            
             <div class="features__grid">
                 <div class="feature-card animate__animated animate__fadeInUp">
                     <div class="feature-card__icon">🕒</div>
@@ -261,7 +232,6 @@
     </div>
 </section>
 
-
 <!-- Booking Modal -->
 <div class="modal hidden" id="booking-modal">
     <div class="modal__overlay" id="modal-overlay"></div>
@@ -276,32 +246,26 @@
                 <label for="book-name" class="form-label">Full Name</label>
                 <input type="text" id="book-name" name="name" class="form-control" required>
             </div>
-
             <div class="booking-form__group">
                 <label for="book-email" class="form-label">Email</label>
                 <input type="email" id="book-email" name="email" class="form-control" required>
             </div>
-
             <div class="booking-form__group">
                 <label for="book-phone" class="form-label">Phone</label>
                 <input type="tel" id="book-phone" name="phone" class="form-control" required>
             </div>
-
             <div class="booking-form__group">
                 <label for="book-car" class="form-label">Selected Car</label>
-                <input type="text" id="book-car" name="car_model" class="form-control" readonly>
+                <input type="text" id="book-car" name="car_model" class="form-control" readonly required>
             </div>
-
             <div class="booking-form__group">
                 <label for="book-pickup-date" class="form-label">Pickup Date</label>
                 <input type="date" id="book-pickup-date" name="pickup_date" class="form-control" required>
             </div>
-
             <div class="booking-form__group">
                 <label for="book-dropoff-date" class="form-label">Drop-off Date</label>
                 <input type="date" id="book-dropoff-date" name="dropoff_date" class="form-control" required>
             </div>
-
             <div class="booking-form__group">
                 <label for="book-pickup-location" class="form-label">Pickup Location</label>
                 <select id="book-pickup-location" name="pickup_location" class="form-control" required>
@@ -314,7 +278,6 @@
                     <option value="Pune">Pune</option>
                 </select>
             </div>
-
             <div class="booking-form__group">
                 <label for="book-dropoff-location" class="form-label">Drop-off Location</label>
                 <select id="book-dropoff-location" name="dropoff_location" class="form-control" required>
@@ -327,7 +290,6 @@
                     <option value="Pune">Pune</option>
                 </select>
             </div>
-
             <div class="booking-form__group">
                 <label class="form-label">Additional Services</label>
                 <div class="checkbox-group">
@@ -342,12 +304,10 @@
                     </label>
                 </div>
             </div>
-
             <div class="booking-form__total">
                 <h3>Total: <span id="booking-total-display">₹0</span></h3>
-                <input type="hidden" name="total_amount" id="booking-total" value="₹0">
+                <input type="hidden" name="total_amount" id="booking-total" value="0">
             </div>
-
             <button type="submit" class="btn btn--primary btn--full-width">Confirm Booking</button>
             <p id="form-status" class="form-status"></p>
         </form>
@@ -358,7 +318,6 @@
 <div class="popup-message" id="booking-popup">
     Booking Confirmed! We'll contact you shortly.
 </div>
-
 
     <!-- Footer -->
     <footer class="footer">
@@ -400,35 +359,6 @@
             </div>
         </div>
     </footer>
-
-
-    <!-- Login Modal -->
-<div class="modal" id="login-modal">
-  <div class="modal__overlay"></div>
-  <div class="modal__content login-modal-content">
-    <div class="modal__header">
-    <h2 class="login-modal-title">Sign in to DriveNova</h2>
-
-      <button class="modal__close" id="login-modal-close">&times;</button>
-    </div>
-    <div class="login-options">
-      <button class="login-option" id="google-login">
-        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="24">
-        Login with Google
-      </button>
-      <button class="login-option disabled" disabled>
-        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" width="24">
-        Facebook <span class="coming-soon">(Coming soon)</span>
-      </button>
-      <button class="login-option disabled" disabled>
-        <img src="https://img.icons8.com/fluency/48/new-post.png" alt="Email Icon" width="24" />
-
-        Email <span class="coming-soon">(Coming soon)</span>
-      </button>
-    </div>
-  </div>
-</div>
-
 
     <script src="app.js"></script>
 </body>

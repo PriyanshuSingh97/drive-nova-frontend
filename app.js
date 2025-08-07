@@ -1,7 +1,7 @@
 // ===== STORE JWT TOKEN IMMEDIATELY ON PAGE LOAD (before anything else!) =====
 (function saveTokenFromUrlImmediately() {
   const m = window.location.search.match(/[?&]token=([^&]+)/);
-  if(m) {
+  if (m) {
     localStorage.setItem('jwt_token', m[1]);
     const p = new URLSearchParams(window.location.search);
     p.delete('token');
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setupLoginModalEvents();
 });
 
-// ===== FETCH CARS FROM BACKEND (MongoDB Atlas) =====
+// ===== FETCH CARS FROM BACKEND =====
 async function fetchAndRenderCars(filter = 'all') {
   try {
     const res = await fetch(`${API_BASE_URL}/api/cars`);
@@ -97,7 +97,7 @@ function createCarCard(car) {
         <div class="car-card__price">₹${safePrice.toLocaleString()}<br><small>per day</small></div>
       </div>
       <div class="car-card__features">
-        ${(car.features || []).map(f => `<span class="feature-tag">${f}</span>`).join('')}
+        ${(Array.isArray(car.features) ? car.features : []).map(f => `<span class="feature-tag">${f}</span>`).join('')}
       </div>
       <button class="btn btn--primary car-card__book" data-car-name="${car.name}" data-car-price="${safePrice}">Book Now</button>
     </div>
@@ -133,6 +133,7 @@ function setupEventListeners() {
   // Booking modal close
   document.getElementById('modal-close')?.addEventListener('click', closeBookingModal);
   document.getElementById('modal-overlay')?.addEventListener('click', closeBookingModal);
+
   ['book-pickup-date', 'book-dropoff-date', 'driver-service', 'gps-service', 'insurance-service']
     .forEach(id => document.getElementById(id)?.addEventListener('change', updateBookingTotal));
 
@@ -168,16 +169,16 @@ function setupEventListeners() {
   }
 }
 
-// ===== LOGIN MODAL EVENTS (in case you ever want to re-enable modal login) =====
+// ===== LOGIN MODAL EVENTS (for completeness) =====
 function setupLoginModalEvents() {
   var modalClose = document.getElementById('login-modal-close');
   var modalOverlay = document.querySelector('#login-modal .modal__overlay');
-  if(modalClose) modalClose.addEventListener('click', closeLoginModal);
-  if(modalOverlay) modalOverlay.addEventListener('click', closeLoginModal);
+  if (modalClose) modalClose.addEventListener('click', closeLoginModal);
+  if (modalOverlay) modalOverlay.addEventListener('click', closeLoginModal);
 
   var googleBtn = document.getElementById('google-login');
-  if(googleBtn) {
-    googleBtn.addEventListener('click', function() {
+  if (googleBtn) {
+    googleBtn.addEventListener('click', function () {
       window.location.href = API_BASE_URL + "/api/auth/google";
     });
   }
@@ -192,8 +193,20 @@ async function handleBookingSubmit(e) {
   }
   const form = e.target;
   const formData = new FormData(form);
-  const bookingData = Object.fromEntries(formData);
-  bookingData.services = formData.getAll('services[]');
+
+  // Strong serialization!
+  const bookingData = {
+    name: formData.get('name'),
+    email: formData.get('email'),
+    phone: formData.get('phone'),
+    car_model: formData.get('car_model'),
+    pickup_date: formData.get('pickup_date'),
+    dropoff_date: formData.get('dropoff_date'),
+    pickup_location: formData.get('pickup_location'),
+    dropoff_location: formData.get('dropoff_location'),
+    services: formData.getAll('services[]'),
+    total_amount: Number(formData.get('total_amount'))
+  };
 
   const formStatus = document.getElementById('form-status');
   formStatus.textContent = 'Sending booking...';
@@ -217,7 +230,11 @@ async function handleBookingSubmit(e) {
       showPopupMessage("Booking Confirmed! We'll contact you shortly.");
     } else {
       if (res.status === 401) { logout(); }
-      formStatus.textContent = 'Booking failed. Please try again.';
+      let errText = 'Booking failed. Please try again.';
+      try {
+        errText = (await res.json()).message || errText;
+      } catch(e) {}
+      formStatus.textContent = errText;
       formStatus.style.color = '#dc3545';
     }
   } catch (err) {
@@ -291,7 +308,7 @@ function updateBookingTotal() {
 
   if (isNaN(start) || isNaN(end) || end <= start) {
     document.getElementById('booking-total-display').textContent = '₹0';
-    document.getElementById('booking-total').value = '₹0';
+    document.getElementById('booking-total').value = '0';
     return;
   }
 
@@ -302,7 +319,7 @@ function updateBookingTotal() {
   if (document.getElementById('insurance-service')?.checked) total += 500 * days;
 
   document.getElementById('booking-total-display').textContent = `₹${total.toLocaleString()}`;
-  document.getElementById('booking-total').value = `₹${total.toLocaleString()}`;
+  document.getElementById('booking-total').value = total;
 }
 
 // ===== POPUP MESSAGE =====
@@ -439,6 +456,4 @@ function openLoginModal() {
 }
 function closeLoginModal() {
   document.getElementById('login-modal').classList.remove('visible');
-
 }
-
