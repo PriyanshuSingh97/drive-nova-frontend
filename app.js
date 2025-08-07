@@ -28,24 +28,23 @@ function logout() {
   location.reload();
 }
 
-// === RENDERS NAV AUTH BUTTON (DESKTOP) ===
+// === RENDER LOGIN/LOGOUT BUTTON IN DESKTOP NAV ===
 function renderAuthButtons() {
-  const nav = document.querySelector('.nav__controls');
-  if (!nav) return;
-  nav.innerHTML = '';
+  const desktopLoginLi = document.getElementById('nav-menu-desktop-login');
+  if (!desktopLoginLi) return;
+  desktopLoginLi.innerHTML = '';
   if (isUserLoggedIn()) {
     const logoutBtn = document.createElement('button');
     logoutBtn.textContent = 'Logout';
     logoutBtn.className = 'btn btn--primary btn-nav-login';
     logoutBtn.onclick = logout;
-    nav.appendChild(logoutBtn);
+    desktopLoginLi.appendChild(logoutBtn);
   } else {
-    // Google Login button (in nav, not modal)
     const a = document.createElement('a');
     a.href = API_BASE_URL + "/api/auth/google";
     a.className = "btn btn--primary btn-nav-login";
     a.innerHTML = `<img src="https://developers.google.com/identity/images/g-logo.png" style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
-    nav.appendChild(a);
+    desktopLoginLi.appendChild(a);
   }
 }
 
@@ -54,20 +53,17 @@ function renderMobileAuthButton() {
   const mobileLoginLi = document.getElementById('nav-menu-mobile-login');
   if (!mobileLoginLi) return;
   mobileLoginLi.innerHTML = '';
-
   if (isUserLoggedIn()) {
     const logoutBtn = document.createElement('button');
     logoutBtn.textContent = 'Logout';
     logoutBtn.className = 'btn btn--primary btn-nav-login mobile-login';
     logoutBtn.onclick = function () {
       logout();
-      // Close hamburger after logout (safe)
       document.getElementById('nav-menu-mobile').classList.remove('active');
       document.getElementById('nav-hamburger').classList.remove('active');
     };
     mobileLoginLi.appendChild(logoutBtn);
   } else {
-    // Google Login
     const loginBtn = document.createElement('a');
     loginBtn.href = API_BASE_URL + "/api/auth/google";
     loginBtn.className = 'btn btn--primary btn-nav-login mobile-login';
@@ -258,7 +254,7 @@ async function handleBookingSubmit(e) {
       closeBookingModal();
       showPopupMessage("Booking Confirmed! We'll contact you shortly.");
       renderMobileAuthButton(); // update Login/Logout in hamburger after booking
-      renderAuthButtons(); // In case login state has changed (edge-case)
+      renderAuthButtons();      // update Login/Logout on desktop
     } else {
       if (res.status === 401) { logout(); }
       let errText = 'Booking failed. Please try again.';
