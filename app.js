@@ -214,7 +214,7 @@ function setupMobileNavScroll() {
         if (section) {
           e.preventDefault();
           // Compute correct offset (header height)
-          const y = section.getBoundingClientRect().top + window.pageYOffset - getHeaderHeight();
+          const y = section.getBoundingClientRect().top + window.pageYOffset - getHeaderHeight() - -3; // -8px visual gap
           window.scrollTo({ top: y, behavior: 'smooth' });
         }
       }
