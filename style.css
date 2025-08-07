@@ -1550,18 +1550,6 @@ border-bottom: 1px solid var(--color-border);
   margin-right: var(--space-8);
 }
 
-/* Dark mode adjustments for modals */
-[data-color-scheme="dark"] .modal__content,
-[data-color-scheme="dark"] .booking-form {
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-[data-color-scheme="dark"] .form-control {
-  background: var(--color-background);
-  color: var(--color-text);
-  border-color: var(--color-border);
-}
 /* Scroll animation */
 [data-animate] {
 opacity: 0;
