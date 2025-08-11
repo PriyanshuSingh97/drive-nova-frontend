@@ -198,11 +198,11 @@ function setupEventListeners() {
 // ===== MOBILE NAV LINK SCROLL LOGIC (ONLY FOR MOBILE) =====
 function setupMobileNavScroll() {
   function isMobile() {
-    // Feel free to adjust the width as per your mobile breakpoint
+    // Adjust the width as per your mobile breakpoint
     return window.innerWidth <= 768;
   }
   function getHeaderHeight() {
-    // Adjust if your mobile header height changes, or get dynamically
+    // Adjust if mobile header height changes, or get dynamically
     const header = document.getElementById('header');
     return header ? header.offsetHeight : 60;
   }
@@ -222,7 +222,7 @@ function setupMobileNavScroll() {
   });
 }
 
-// ===== LOGIN MODAL EVENTS (for completeness) =====
+// ===== LOGIN MODAL EVENTS  =====
 function setupLoginModalEvents() {
   var modalClose = document.getElementById('login-modal-close');
   var modalOverlay = document.querySelector('#login-modal .modal__overlay');
