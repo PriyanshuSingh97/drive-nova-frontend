@@ -43,7 +43,7 @@ function renderAuthButtons() {
     const a = document.createElement('a');
     a.href = API_BASE_URL + "/api/auth/google";
     a.className = "btn btn--primary btn-nav-login";
-    a.innerHTML = `<img src="https://developers.google.com/identity/images/g-logo.png" style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
+    a.innerHTML = `<img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
     desktopLoginLi.appendChild(a);
   }
 }
@@ -67,7 +67,7 @@ function renderMobileAuthButton() {
     const loginBtn = document.createElement('a');
     loginBtn.href = API_BASE_URL + "/api/auth/google";
     loginBtn.className = 'btn btn--primary btn-nav-login mobile-login';
-    loginBtn.innerHTML = `<img src="https://developers.google.com/identity/images/g-logo.png" style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
+    loginBtn.innerHTML = `<img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
     mobileLoginLi.appendChild(loginBtn);
   }
 }
@@ -234,7 +234,7 @@ function setupEventListeners() {
 // MOBILE NAV LINK SCROLL LOGIC (ONLY FOR MOBILE)
 function setupMobileNavScroll() {
   function isMobile() {
-    // Adjust the width for mobile breakpoint
+    // Width for mobile breakpoint
     return window.innerWidth <= 768;
   }
   function getHeaderHeight() {
@@ -565,7 +565,7 @@ function setupSearch(inputId, resultsId, buttonId) {
   fetchAllCarsForSearch();
 }
 
-// SMOOTH SCROLL FOR FOOTER AND NAV LINKS (MOBILE-AWARE)
+// SMOOTH SCROLL FOR FOOTER AND NAV LINKS (MOBILE)
 function setupSmoothScroll() {
   const scrollLinks = document.querySelectorAll('a[href^="#"]');
   const mobileNav = document.getElementById('nav-menu-mobile');

@@ -412,7 +412,6 @@ background-size: 16px;
 padding-right: var(--space-32);
 }
 
-/* Add a dark mode specific caret */
 /* Handle data-color-scheme */
 [data-color-scheme="dark"] select.form-control {
 background-image: var(--select-caret-dark);
@@ -812,7 +811,7 @@ top: 0;
 left: 0;
 width: 100%;
 height: 100%;
-background-image: url('https://res.cloudinary.com/dtvyar9as/image/upload/v1754553638/Mercedes_S-Class_wwav1r.png');
+background-image: url('https://res.cloudinary.com/dtvyar9as/image/upload/v1755343600/Mercedes_S-Class_gmgynk.jpg');
 background-size: cover;
 background-position: center;
 opacity: 0.08;
