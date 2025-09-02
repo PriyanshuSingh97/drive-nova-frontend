@@ -1,4 +1,4 @@
-// ===== STORE JWT TOKEN IMMEDIATELY ON PAGE LOAD (before anything else!) =====
+// STORE JWT TOKEN IMMEDIATELY ON PAGE LOAD (before anything else) 
 (function saveTokenFromUrlImmediately() {
   const m = window.location.search.match(/[?&]token=([^&]+)/);
   if (m) {
@@ -15,7 +15,7 @@ let currentFilter = 'all';
 let currentSelectedCar = null;
 let isDarkMode = false;
 
-// === AUTH HELPERS ===
+// AUTH HELPERS
 function authHeaders() {
   const token = localStorage.getItem('jwt_token');
   return token ? { 'Authorization': 'Bearer ' + token } : {};
@@ -28,7 +28,7 @@ function logout() {
   location.reload();
 }
 
-// === RENDER LOGIN/LOGOUT BUTTON IN DESKTOP NAV ===
+// RENDER LOGIN/LOGOUT BUTTON IN DESKTOP NAV 
 function renderAuthButtons() {
   const desktopLoginLi = document.getElementById('nav-menu-desktop-login');
   if (!desktopLoginLi) return;
@@ -48,7 +48,7 @@ function renderAuthButtons() {
   }
 }
 
-// === RENDERS MOBILE NAV LOGIN/LOGOUT BUTTON ===
+//  RENDERS MOBILE NAV LOGIN/LOGOUT BUTTON
 function renderMobileAuthButton() {
   const mobileLoginLi = document.getElementById('nav-menu-mobile-login');
   if (!mobileLoginLi) return;
@@ -72,7 +72,7 @@ function renderMobileAuthButton() {
   }
 }
 
-// ===== INIT APP =====
+// INIT APP
 document.addEventListener('DOMContentLoaded', function () {
   initializeTheme();
   fetchAndRenderCars();
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setupSmoothScroll();
 });
 
-// ===== FETCH CARS FROM BACKEND =====
+// FETCH CARS FROM BACKEND
 async function fetchAndRenderCars(filter = 'all') {
   const carsContainer = document.getElementById('cars-container');
   if (!carsContainer) return;
@@ -141,7 +141,7 @@ async function fetchAndRenderCars(filter = 'all') {
 
 
 
-// ===== CREATE CAR CARD =====
+// CREATE CAR CARD
 function createCarCard(car) {
   const safePrice = Number(car.pricePerDay) || 0;
   const card = document.createElement('div');
@@ -166,7 +166,7 @@ function createCarCard(car) {
   return card;
 }
 
-// ===== EVENT LISTENERS =====
+// EVENT LISTENERS
 function setupEventListeners() {
   // Car booking button click
   document.getElementById('cars-container')?.addEventListener('click', (e) => {
@@ -231,14 +231,14 @@ function setupEventListeners() {
   }
 }
 
-// ===== MOBILE NAV LINK SCROLL LOGIC (ONLY FOR MOBILE) =====
+// MOBILE NAV LINK SCROLL LOGIC (ONLY FOR MOBILE)
 function setupMobileNavScroll() {
   function isMobile() {
-    // Adjust the width as per your mobile breakpoint
+    // Adjust the width for mobile breakpoint
     return window.innerWidth <= 768;
   }
   function getHeaderHeight() {
-    // Adjust if mobile header height changes, or get dynamically
+    // Mobile Header Height 
     const header = document.getElementById('header');
     return header ? header.offsetHeight : 60;
   }
@@ -258,7 +258,7 @@ function setupMobileNavScroll() {
   });
 }
 
-// ===== LOGIN MODAL EVENTS  =====
+// LOGIN MODAL EVENTS
 function setupLoginModalEvents() {
   var modalClose = document.getElementById('login-modal-close');
   var modalOverlay = document.querySelector('#login-modal .modal__overlay');
@@ -273,7 +273,7 @@ function setupLoginModalEvents() {
   }
 }
 
-// ===== BOOKING FORM SUBMIT (MongoDB) =====
+// BOOKING FORM SUBMIT (MongoDB)
 async function handleBookingSubmit(e) {
   e.preventDefault();
   if (!isUserLoggedIn()) {
@@ -335,7 +335,7 @@ async function handleBookingSubmit(e) {
   }
 }
 
-// ===== CONTACT FORM SUBMIT (MongoDB) =====
+//  CONTACT FORM SUBMIT (MongoDB)
 async function handleContactSubmit(e) {
   e.preventDefault();
   const form = e.target;
@@ -370,7 +370,7 @@ async function handleContactSubmit(e) {
   }
 }
 
-// ===== MODAL FUNCTIONS =====
+// MODAL FUNCTIONS
 function openBookingModal(name, price) {
   currentSelectedCar = { name, price: Number(price) || 0 };
   const modal = document.getElementById('booking-modal');
@@ -391,7 +391,7 @@ function closeBookingModal() {
   currentSelectedCar = null;
 }
 
-// ===== UPDATE BOOKING TOTAL =====
+// UPDATE BOOKING TOTAL
 function updateBookingTotal() {
   if (!currentSelectedCar) return;
   const start = new Date(document.getElementById('book-pickup-date').value);
@@ -413,7 +413,7 @@ function updateBookingTotal() {
   document.getElementById('booking-total').value = total;
 }
 
-// ===== POPUP MESSAGE =====
+// POPUP MESSAGE
 function showPopupMessage(message, isTemporary = true) {
   const popup = document.getElementById('booking-popup');
   if (!popup) return;
@@ -422,7 +422,7 @@ function showPopupMessage(message, isTemporary = true) {
   if (isTemporary) setTimeout(() => popup.classList.remove('visible'), 3000);
 }
 
-// ===== THEME =====
+// THEME
 const themeSwitch = document.getElementById('theme-switch');
 const mobileThemeSwitch = document.getElementById('mobile-theme-switch');
 
@@ -446,7 +446,7 @@ function updateTheme() {
   document.documentElement.setAttribute('data-color-scheme', isDarkMode ? 'dark' : 'light');
 }
 
-// ===== SCROLL EFFECTS =====
+// SCROLL EFFECTS
 function setupScrollEffects() {
   const header = document.getElementById('header');
   window.addEventListener('scroll', () => {
@@ -464,7 +464,7 @@ function setupScrollAnimations() {
   animateElements.forEach(el => observer.observe(el));
 }
 
-// ===== DATE DEFAULTS =====
+// DATE DEFAULTS
 function setDefaultDates() {
   const today = new Date();
   const tomorrow = new Date(today);
@@ -481,7 +481,7 @@ function setDefaultDates() {
   }
 }
 
-// ===== SEARCH BAR =====
+// SEARCH BAR
 function setupSearch(inputId, resultsId, buttonId) {
   const input = document.getElementById(inputId);
   const resultsContainer = document.getElementById(resultsId);
@@ -547,7 +547,7 @@ function setupSearch(inputId, resultsId, buttonId) {
     }, 300); // Debounce to avoid excessive API calls on every keystroke
   });
 
-  // *** THE FIX: Show suggestions when the input is clicked (focused) ***
+  // Show suggestions when the input is clicked
   input.addEventListener('focus', () => {
     if (input.value.trim()) {
       showSuggestions(input.value.trim());
@@ -565,7 +565,7 @@ function setupSearch(inputId, resultsId, buttonId) {
   fetchAllCarsForSearch();
 }
 
-// ===== SMOOTH SCROLL FOR FOOTER AND NAV LINKS (MOBILE-AWARE) =====
+// SMOOTH SCROLL FOR FOOTER AND NAV LINKS (MOBILE-AWARE)
 function setupSmoothScroll() {
   const scrollLinks = document.querySelectorAll('a[href^="#"]');
   const mobileNav = document.getElementById('nav-menu-mobile');
@@ -601,7 +601,7 @@ function setupSmoothScroll() {
 }
 
 
-// ==== LOGIN MODAL SUPPORT (optional, safe to ignore if not visible) ====
+// LOGIN MODAL SUPPORT (optional, safe to ignore if not visible)
 function openLoginModal() {
   document.getElementById('login-modal').classList.add('visible');
 }
