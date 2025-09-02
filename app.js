@@ -84,27 +84,62 @@ document.addEventListener('DOMContentLoaded', function () {
   renderAuthButtons();
   renderMobileAuthButton();
   setupLoginModalEvents();
-  setupMobileNavScroll(); // <---- add custom mobile nav scroll
+  setupMobileNavScroll();
+  setupSmoothScroll();
 });
 
 // ===== FETCH CARS FROM BACKEND =====
 async function fetchAndRenderCars(filter = 'all') {
+  const carsContainer = document.getElementById('cars-container');
+  if (!carsContainer) return;
+
+  // HTML for the centered loading spinner
+  const loadingHTML = `
+    <div class="loading-container">
+      <div class="loading-spinner">
+        <div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <p class="loading-text">Loading cars...</p>
+    </div>
+  `;
+
+  // Show loading indicator
+  carsContainer.innerHTML = loadingHTML;
+
   try {
     const res = await fetch(`${API_BASE_URL}/api/cars`);
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
     const cars = await res.json();
-    const carsContainer = document.getElementById('cars-container');
-    if (!carsContainer) return;
+    
+    // Clear the container before rendering cars
     carsContainer.innerHTML = '';
-    const filteredCars = (filter === 'all') ? cars : cars.filter(car => car.category === filter);
-    filteredCars.forEach((car, index) => {
-      const card = createCarCard(car);
-      carsContainer.appendChild(card);
-      setTimeout(() => card.classList.add('visible'), index * 50);
-    });
+
+    const filteredCars = (filter === 'all') ? cars : cars.filter(car => car.category.toLowerCase() === filter.toLowerCase());
+
+    if (filteredCars.length === 0) {
+      // If no cars are found, display a message in the container
+      carsContainer.innerHTML = '<div class="loading-container"><p class="loading-text">No cars found in this category.</p></div>';
+    } else {
+      // Render car cards
+      filteredCars.forEach((car, index) => {
+        const card = createCarCard(car);
+        carsContainer.appendChild(card);
+        setTimeout(() => card.classList.add('visible'), index * 50);
+      });
+    }
+
   } catch (err) {
     console.error('Failed to fetch cars:', err);
+    // Display an error message within the container
+    carsContainer.innerHTML = '<div class="loading-container"><p class="loading-text error">Failed to load cars. Please try again later.</p></div>';
   }
 }
+
+
 
 // ===== CREATE CAR CARD =====
 function createCarCard(car) {
@@ -112,6 +147,7 @@ function createCarCard(car) {
   const card = document.createElement('div');
   card.className = 'car-card';
   card.setAttribute('data-animate', 'true');
+  card.setAttribute('data-car-name', car.name);
   card.innerHTML = `
     <div class="car-card__image">
       <img src="${car.imageUrl}" alt="${car.name}" loading="lazy">
@@ -447,63 +483,123 @@ function setDefaultDates() {
 
 // ===== SEARCH BAR =====
 function setupSearch(inputId, resultsId, buttonId) {
-  const searchInput = document.getElementById(inputId);
+  const input = document.getElementById(inputId);
+  const resultsContainer = document.getElementById(resultsId);
   const searchButton = document.getElementById(buttonId);
-  const searchResults = document.getElementById(resultsId);
-  if (!searchInput || !searchResults) return;
+  let allCars = []; // Cache for all car data
+  let debounceTimer;
 
-  const performSearch = () => {
-    const query = searchInput.value.toLowerCase();
-    searchResults.innerHTML = '';
-    const items = document.querySelectorAll('.car-card__name');
-    const matches = [];
-    items.forEach((el) => {
-      if (el.textContent.toLowerCase().includes(query)) {
-        matches.push(el.textContent);
-      }
-    });
+  // Fetch all cars once to use for local search suggestions
+  async function fetchAllCarsForSearch() {
+    if (allCars.length > 0) return; // Use cache if available
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/cars`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      allCars = await response.json();
+    } catch (error) {
+      console.error("Failed to fetch car list for search:", error);
+    }
+  }
 
-    if (matches.length > 0) {
-      matches.slice(0, 5).forEach((name) => {
+  // Display suggestions based on the search query
+  function showSuggestions(query) {
+    if (!query) {
+      resultsContainer.style.display = 'none';
+      return;
+    }
+    const filteredCars = allCars.filter(car =>
+      car.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    resultsContainer.innerHTML = '';
+    if (filteredCars.length > 0) {
+      filteredCars.forEach(car => {
         const item = document.createElement('div');
         item.className = 'search-result-item';
-        item.textContent = name;
+        item.textContent = car.name;
+        // Handle click on a suggestion
         item.addEventListener('click', () => {
-          searchInput.value = name;
-          searchResults.style.display = 'none';
-          scrollToCar(name);
+          input.value = car.name;
+          resultsContainer.style.display = 'none';
+          
+          // Find the corresponding car card and scroll to it
+          const carCard = document.querySelector(`.car-card[data-car-name="${car.name}"]`);
+          if (carCard) {
+            carCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Highlight the card briefly
+            carCard.classList.add('highlight');
+            setTimeout(() => carCard.classList.remove('highlight'), 2000);
+          }
         });
-        searchResults.appendChild(item);
+        resultsContainer.appendChild(item);
       });
+      resultsContainer.style.display = 'block';
     } else {
-      const noResult = document.createElement('div');
-      noResult.className = 'search-result-item';
-      noResult.textContent = 'No cars found';
-      searchResults.appendChild(noResult);
+      resultsContainer.style.display = 'none';
     }
-    searchResults.style.display = 'block';
-  };
+  }
+  
+  // Event listener for when the user types
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      showSuggestions(input.value.trim());
+    }, 300); // Debounce to avoid excessive API calls on every keystroke
+  });
 
-  searchInput.addEventListener('input', performSearch);
-  searchButton?.addEventListener('click', performSearch);
-  document.addEventListener('click', (e) => {
-    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-      searchResults.style.display = 'none';
+  // *** THE FIX: Show suggestions when the input is clicked (focused) ***
+  input.addEventListener('focus', () => {
+    if (input.value.trim()) {
+      showSuggestions(input.value.trim());
     }
+  });
+
+  // Hide the suggestions when the user clicks anywhere else on the page
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.search-container')) { // Assumes search bar has a parent with class 'search-container'
+      resultsContainer.style.display = 'none';
+    }
+  });
+
+  // Initial fetch of car data when the page loads
+  fetchAllCarsForSearch();
+}
+
+// ===== SMOOTH SCROLL FOR FOOTER AND NAV LINKS (MOBILE-AWARE) =====
+function setupSmoothScroll() {
+  const scrollLinks = document.querySelectorAll('a[href^="#"]');
+  const mobileNav = document.getElementById('nav-menu-mobile');
+  const hamburger = document.getElementById('nav-hamburger');
+
+  scrollLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault(); // Stop the default anchor jump
+
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      
+      if (targetElement) {
+        // Close mobile nav if it's open
+        if (mobileNav && mobileNav.classList.contains('active')) {
+          mobileNav.classList.remove('active');
+          hamburger.classList.remove('active');
+        }
+
+        // Calculate the correct position
+        const headerOffset = window.innerWidth <= 1024 ? 60 : 60; // 1st 60px offset for mobile, 2nd 60px for desktop
+        const elementPosition = targetElement.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        // Perform the smooth scroll
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+    });
   });
 }
 
-function scrollToCar(name) {
-  const cards = document.querySelectorAll('.car-card');
-  cards.forEach((card) => {
-    const carName = card.querySelector('.car-card__name');
-    if (carName && carName.textContent === name) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      card.classList.add('highlighted-card');
-      setTimeout(() => card.classList.remove('highlighted-card'), 1500);
-    }
-  });
-}
 
 // ==== LOGIN MODAL SUPPORT (optional, safe to ignore if not visible) ====
 function openLoginModal() {
