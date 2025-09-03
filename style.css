@@ -2135,8 +2135,9 @@ border: 2px solid var(--color-border);
 
 /* Mobile-specific positioning */
 .mobile-login {
-    margin-top: 10px;
-    text-align: center;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Loading Spinner and Status Messages  */
