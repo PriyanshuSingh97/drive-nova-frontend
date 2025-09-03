@@ -332,16 +332,15 @@ outline: none;
 box-shadow: var(--focus-ring);
 }
 .btn--primary {
-  background: var(--color-vibrant-blue); /* Changed to solid blue */
+  background: var(--color-vibrant-blue);
   color: var(--color-btn-primary-text);
   font-weight: var(--font-weight-medium);
 }
 .btn--primary:hover {
-  background: var(--color-vibrant-blue-darker); /* Darker blue on hover */
+  background: var(--color-vibrant-blue-darker);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
-
 .btn--primary:active {
   background: rgba(30, 64, 175, 1); /* Darkest blue for active */
   transform: translateY(0);
@@ -626,9 +625,8 @@ outline-offset: 2px;
 border: 1px solid var(--color-border-secondary);
 }
 @font-face {
-font-family: 'FKGroteskNeue';
-src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2')
-format('woff2');
+  font-family: 'FKGroteskNeue';
+  src: url('./fonts/FKGroteskNeue.woff2') format('woff2'); /* Loads the font locally */
 }
 
 /* Smooth scrolling */
