@@ -1647,6 +1647,14 @@ grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 gap: var(--space-24);
 }
 
+/* Mobile login button alignment */
+#nav-menu-mobile-login {
+  text-align: center;
+  width: 100%;
+  padding: var(--space-12) 0;
+  border-bottom: none; /* Ensures it matches the style of the last nav item */
+}
+
 /* Navigation for tablet and smaller desktops */
 .nav {
     display: grid;
@@ -1783,15 +1791,15 @@ font-size: var(--font-size-lg);
 padding: var(--space-24) 0;
 }
 .fleet__filters {
-flex-direction: column;
-align-items: center;
-gap: var(--space-12);
-padding: 0 var(--space-16);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Creates a responsive grid */
+  gap: var(--space-12);
+  padding: 0 var(--space-16);
 }
 .filter-btn {
-width: 200px;
-text-align: center;
-padding: var(--space-10) var(--space-20);
+  width: 100%; /* Allows the button to fill the grid cell */
+  text-align: center;
+  padding: var(--space-10) var(--space-20);
 }
 .fleet__grid {
 grid-template-columns: 1fr;
