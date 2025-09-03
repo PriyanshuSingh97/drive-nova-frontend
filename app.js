@@ -93,9 +93,19 @@ async function fetchAndRenderCars(filter = 'all') {
     const carsContainer = document.getElementById('cars-container');
     if (!carsContainer) return;
 
-    const loadingHTML = `<div class="loading-state"><div></div><div></div><div></div></div>`;
-    carsContainer.innerHTML = loadingHTML;
+    const loadingHTML = `
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <p class="loading-text">Loading cars...</p>
+  </div>
+`;
 
+    carsContainer.innerHTML = loadingHTML;
+    
     try {
         const url = new URL(`${API_BASE_URL}/api/cars`);
         if (filter !== 'all') {
