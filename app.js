@@ -1,6 +1,4 @@
-// === 1. TOKEN STORAGE & CONFIG ===
-
-// Save token from URL immediately if present
+// STORE JWT TOKEN IMMEDIATELY
 (function saveTokenFromUrlImmediately() {
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
@@ -16,8 +14,7 @@ let isDarkMode = false;
 let currentSelectedCar = null;
 
 
-// === 2. AUTH HELPERS ===
-
+//  AUTH HELPERS 
 function authHeaders() {
   const token = localStorage.getItem('jwt_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -35,8 +32,7 @@ function logout() {
 }
 
 
-// === 3. RENDERING AUTH BUTTONS ===
-
+// RENDERING AUTH BUTTONS DESKTOP
 function renderAuthButtons() {
   const desktopLoginLi = document.getElementById('nav-menu-desktop-login');
   if (!desktopLoginLi) return;
@@ -57,6 +53,7 @@ function renderAuthButtons() {
   }
 }
 
+// RENDERING AUTH BUTTONS MOBILE
 function renderMobileAuthButton() {
   const mobileLoginLi = document.getElementById('nav-menu-mobile-login');
   if (!mobileLoginLi) return;
@@ -82,7 +79,7 @@ function renderMobileAuthButton() {
 }
 
 
-// === 4. INITIALIZATION ===
+// INITIALIZATION
 document.addEventListener('DOMContentLoaded', function () {
   initializeTheme();
   fetchAndRenderCars();
@@ -99,11 +96,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-// === 5. FETCH & RENDER CARS ===
+// FETCH & RENDER CARS
 async function fetchAndRenderCars(filter = 'all') {
   const carsContainer = document.getElementById('cars-container');
   if (!carsContainer) return;
 
+  // HTML for the loading spinner
   const loadingHTML = `
     <div class="loading-container">
       <div class="loading-spinner">
@@ -114,6 +112,8 @@ async function fetchAndRenderCars(filter = 'all') {
       <p class="loading-text">Loading cars...</p>
     </div>
   `;
+
+  // Show loading indicator
   carsContainer.innerHTML = loadingHTML;
 
   try {
@@ -123,8 +123,10 @@ async function fetchAndRenderCars(filter = 'all') {
 
     carsContainer.innerHTML = '';
     if (cars.length === 0) {
+      // If no cars are found, display a message in the container
       carsContainer.innerHTML = '<div class="loading-container"><p class="loading-text">No cars found in this category.</p></div>';
     } else {
+      // Render car cards
       cars.forEach((car, index) => {
         const card = createCarCard(car);
         carsContainer.appendChild(card);
@@ -133,12 +135,14 @@ async function fetchAndRenderCars(filter = 'all') {
     }
   } catch (err) {
     console.error('Failed to fetch cars:', err);
+
+    // Display an error message within the container
     carsContainer.innerHTML = '<div class="loading-container"><p class="loading-text error">Failed to load cars. Please try again later.</p></div>';
   }
 }
 
 
-// === 6. CAR CARD CREATION ===
+// CAR CARD CREATION
 function createCarCard(car) {
   const safePrice = Number(car.pricePerDay) || 0;
   const card = document.createElement('div');
@@ -164,8 +168,10 @@ function createCarCard(car) {
 }
 
 
-// === 7. EVENT LISTENERS ===
+// EVENT LISTENERS
 function setupEventListeners() {
+
+  // Car booking button click
   document.getElementById('cars-container')?.addEventListener('click', (e) => {
     if (e.target.classList.contains('car-card__book')) {
       if (!isUserLoggedIn()) {
@@ -178,6 +184,7 @@ function setupEventListeners() {
     }
   });
 
+  // Filter buttons
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', function () {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -187,22 +194,25 @@ function setupEventListeners() {
     });
   });
 
+  // Booking modal close
   document.getElementById('modal-close')?.addEventListener('click', closeBookingModal);
   document.getElementById('modal-overlay')?.addEventListener('click', closeBookingModal);
 
   ['book-pickup-date', 'book-dropoff-date', 'driver-service', 'gps-service', 'insurance-service']
     .forEach(id => document.getElementById(id)?.addEventListener('change', updateBookingTotal));
 
-  document.getElementById('booking-form')?.addEventListener('submit', handleBookingSubmit);
-  document.getElementById('contact-form')?.addEventListener('submit', handleContactSubmit);
+  document.getElementById('booking-form')?.addEventListener('submit', handleBookingSubmit); // Booking form submission
+  document.getElementById('contact-form')?.addEventListener('submit', handleContactSubmit); // Contact form submission
 
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', (e) => { // Escape key closes modal
     if (e.key === 'Escape') closeBookingModal();
   });
 
+  // Theme toggles
   if (themeSwitch) themeSwitch.addEventListener('change', toggleTheme);
   if (mobileThemeSwitch) mobileThemeSwitch.addEventListener('change', toggleTheme);
 
+  // Hamburger menu
   const hamburger = document.getElementById('nav-hamburger');
   const navMenuMobile = document.getElementById('nav-menu-mobile');
   if (hamburger && navMenuMobile) {
@@ -221,7 +231,7 @@ function setupEventListeners() {
 }
 
 
-// === 8. MOBILE NAV SCROLL ===
+// MOBILE NAV SCROLL
 function setupMobileNavScroll() {
   function isMobile() {
     return window.innerWidth <= 768;
@@ -245,7 +255,7 @@ function setupMobileNavScroll() {
 }
 
 
-// === 9. LOGIN MODAL EVENTS ===
+// LOGIN MODAL EVENTS
 function setupLoginModalEvents() {
   const modalClose = document.getElementById('login-modal-close');
   const modalOverlay = document.querySelector('#login-modal .modal__overlay');
@@ -261,7 +271,7 @@ function setupLoginModalEvents() {
 }
 
 
-// === 10. BOOKING FORM SUBMIT ===
+// BOOKING FORM SUBMIT
 async function handleBookingSubmit(e) {
   e.preventDefault();
   if (!isUserLoggedIn()) {
@@ -305,8 +315,8 @@ async function handleBookingSubmit(e) {
       form.reset();
       closeBookingModal();
       showPopupMessage("Booking Confirmed! We'll contact you shortly.");
-      renderMobileAuthButton();
-      renderAuthButtons();
+      renderMobileAuthButton(); // update Login/Logout in hamburger after booking
+      renderAuthButtons();      // update Login/Logout on desktop
     } else {
       if (res.status === 401) { logout(); }
       let errText = 'Booking failed. Please try again.';
@@ -324,7 +334,7 @@ async function handleBookingSubmit(e) {
 }
 
 
-// === 11. CONTACT FORM SUBMIT ===
+// CONTACT FORM SUBMIT
 async function handleContactSubmit(e) {
   e.preventDefault();
   const form = e.target;
@@ -360,7 +370,7 @@ async function handleContactSubmit(e) {
 }
 
 
-// === 12. MODAL FUNCTIONS ===
+// MODAL FUNCTIONS
 function openBookingModal(name, price) {
   currentSelectedCar = { name, price: Number(price) || 0 };
   const modal = document.getElementById('booking-modal');
@@ -381,6 +391,7 @@ function closeBookingModal() {
   currentSelectedCar = null;
 }
 
+// UPDATE BOOKING TOTAL
 function updateBookingTotal() {
   if (!currentSelectedCar) return;
   const start = new Date(document.getElementById('book-pickup-date').value);
@@ -402,6 +413,7 @@ function updateBookingTotal() {
   document.getElementById('booking-total').value = total;
 }
 
+// POPUP MESSAGE
 function showPopupMessage(message, isTemporary = true) {
   const popup = document.getElementById('booking-popup');
   if (!popup) return;
@@ -411,7 +423,7 @@ function showPopupMessage(message, isTemporary = true) {
 }
 
 
-// === THEME ===
+// THEME
 const themeSwitch = document.getElementById('theme-switch');
 const mobileThemeSwitch = document.getElementById('mobile-theme-switch');
 
@@ -436,7 +448,7 @@ function updateTheme() {
 }
 
 
-// === SCROLL EFFECTS ===
+// SCROLL EFFECTS
 function setupScrollEffects() {
   const header = document.getElementById('header');
   window.addEventListener('scroll', () => {
@@ -455,7 +467,7 @@ function setupScrollAnimations() {
 }
 
 
-// === DATE DEFAULTS ===
+// DATE DEFAULTS
 function setDefaultDates() {
   const today = new Date();
   const tomorrow = new Date(today);
@@ -473,16 +485,17 @@ function setDefaultDates() {
 }
 
 
-// === 13. SEARCH SETUP ===
+// SEARCH BAR
 function setupSearch(inputId, resultsId, buttonId) {
   const input = document.getElementById(inputId);
   const resultsContainer = document.getElementById(resultsId);
   const searchButton = document.getElementById(buttonId);
-  let allCars = [];
+  let allCars = []; // Cache for all car data
   let debounceTimer;
 
   if (!input || !resultsContainer) return;
 
+  // Fetch all cars once to use for local search suggestions
   async function fetchAllCarsForSearch() {
     if (allCars.length > 0) return;
     try {
@@ -494,6 +507,7 @@ function setupSearch(inputId, resultsId, buttonId) {
     }
   }
 
+  // Display suggestions based on the search query
   function showSuggestions(query) {
     if (!query) {
       resultsContainer.style.display = 'none';
@@ -509,12 +523,18 @@ function setupSearch(inputId, resultsId, buttonId) {
         const item = document.createElement('div');
         item.className = 'search-result-item';
         item.textContent = car.name;
+
+        // Handle click on a suggestion
         item.addEventListener('click', () => {
           input.value = car.name;
           resultsContainer.style.display = 'none';
+
+          // Find the corresponding car card and scroll to it
           const carCard = document.querySelector(`.car-card[data-car-name="${car.name}"]`);
           if (carCard) {
             carCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Highlight the card briefly
             carCard.classList.add('highlight');
             setTimeout(() => carCard.classList.remove('highlight'), 2000);
           }
@@ -527,30 +547,34 @@ function setupSearch(inputId, resultsId, buttonId) {
     }
   }
 
+  // Event listener for when the user types
   input.addEventListener('input', () => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       showSuggestions(input.value.trim());
-    }, 300);
+    }, 300); // Debounce to avoid excessive API calls on every keystroke
   });
 
+  // Show suggestions when the input is clicked
   input.addEventListener('focus', () => {
     if (input.value.trim()) {
       showSuggestions(input.value.trim());
     }
   });
 
+  // Hide the suggestions when the user clicks anywhere else on the page
   document.addEventListener('click', (event) => {
-    if (!event.target.closest('.search-container')) {
+    if (!event.target.closest('.search-container')) { // Assumes search bar has a parent with class 'search-container'
       resultsContainer.style.display = 'none';
     }
   });
 
+  // Initial fetch of car data when the page loads
   fetchAllCarsForSearch();
 }
 
 
-// === SMOOTH SCROLL ===
+// SMOOTH SCROLL FOR FOOTER AND NAV LINKS (MOBILE)
 function setupSmoothScroll() {
   const scrollLinks = document.querySelectorAll('a[href^="#"]');
   const mobileNav = document.getElementById('nav-menu-mobile');
@@ -558,17 +582,22 @@ function setupSmoothScroll() {
 
   scrollLinks.forEach(link => {
     link.addEventListener('click', function (e) {
-      e.preventDefault();
+      e.preventDefault(); // Stop the default anchor jump
       const targetId = this.getAttribute('href');
       const targetElement = document.querySelector(targetId);
       if (targetElement) {
+
+        // Close mobile nav if it's open
         if (mobileNav && mobileNav.classList.contains('active')) {
           mobileNav.classList.remove('active');
           hamburger.classList.remove('active');
         }
-        const headerOffset = window.innerWidth <= 1024 ? 60 : 60;
+        // Calculate the correct position
+        const headerOffset = window.innerWidth <= 1024 ? 60 : 60; // 1st 60px offset for mobile, 2nd 60px for desktop
         const elementPosition = targetElement.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        // Perform the smooth scroll
         window.scrollTo({
           top: offsetPosition,
           behavior: "smooth"
@@ -579,7 +608,7 @@ function setupSmoothScroll() {
 }
 
 
-// === LOGIN MODAL SUPPORT ===
+// LOGIN MODAL SUPPORT
 function openLoginModal() {
   document.getElementById('login-modal').classList.add('visible');
 }
