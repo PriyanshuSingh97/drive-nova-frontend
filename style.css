@@ -1797,9 +1797,10 @@ padding: var(--space-24) 0;
   padding: 0 var(--space-16);
 }
 .filter-btn {
-  width: 100%; /* Allows the button to fill the grid cell */
+  width: 100%;
   text-align: center;
-  padding: var(--space-10) var(--space-20);
+  padding: var(--space-8) var(--space-12); /* Reduced padding */
+  font-size: var(--font-size-sm); /* Reduced font size */
 }
 .fleet__grid {
 grid-template-columns: 1fr;
@@ -1889,11 +1890,6 @@ margin: 0;
 .about__stats {
 grid-template-columns: 1fr;
 gap: var(--space-12);
-}
-.filter-btn {
-width: 180px;
-padding: var(--space-8) var(--space-16);
-font-size: var(--font-size-xs);
 }
 .feature-card {
 padding: var(--space-20);
