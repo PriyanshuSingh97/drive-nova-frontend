@@ -1,34 +1,42 @@
-// STORE JWT TOKEN IMMEDIATELY ON PAGE LOAD (before anything else) 
+// === 1. TOKEN STORAGE & CONFIG ===
+
+// Save token from URL immediately if present
 (function saveTokenFromUrlImmediately() {
-  const m = window.location.search.match(/[?&]token=([^&]+)/);
-  if (m) {
-    localStorage.setItem('jwt_token', m[1]);
-    const p = new URLSearchParams(window.location.search);
-    p.delete('token');
-    window.history.replaceState({}, document.title, window.location.pathname + (p.toString() ? `?${p}` : ''));
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (token) {
+    localStorage.setItem('jwt_token', token);
+    window.history.replaceState({}, document.title, window.location.pathname);
   }
 })();
 
 const API_BASE_URL = "https://drivenova-backend.onrender.com";
-
 let currentFilter = 'all';
-let currentSelectedCar = null;
 let isDarkMode = false;
+let currentSelectedCar = null;
 
-// AUTH HELPERS
+
+// === 2. AUTH HELPERS ===
+
 function authHeaders() {
   const token = localStorage.getItem('jwt_token');
-  return token ? { 'Authorization': 'Bearer ' + token } : {};
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
+
 function isUserLoggedIn() {
   return !!localStorage.getItem('jwt_token');
 }
+
 function logout() {
   localStorage.removeItem('jwt_token');
-  location.reload();
+  renderAuthButtons();
+  renderMobileAuthButton();
+  showPopupMessage("Logged out successfully.");
 }
 
-// RENDER LOGIN/LOGOUT BUTTON IN DESKTOP NAV 
+
+// === 3. RENDERING AUTH BUTTONS ===
+
 function renderAuthButtons() {
   const desktopLoginLi = document.getElementById('nav-menu-desktop-login');
   if (!desktopLoginLi) return;
@@ -43,12 +51,12 @@ function renderAuthButtons() {
     const a = document.createElement('a');
     a.href = API_BASE_URL + "/api/auth/google";
     a.className = "btn btn--primary btn-nav-login";
-    a.innerHTML = `<img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
+    a.innerHTML = `<img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" 
+      style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
     desktopLoginLi.appendChild(a);
   }
 }
 
-//  RENDERS MOBILE NAV LOGIN/LOGOUT BUTTON
 function renderMobileAuthButton() {
   const mobileLoginLi = document.getElementById('nav-menu-mobile-login');
   if (!mobileLoginLi) return;
@@ -67,12 +75,14 @@ function renderMobileAuthButton() {
     const loginBtn = document.createElement('a');
     loginBtn.href = API_BASE_URL + "/api/auth/google";
     loginBtn.className = 'btn btn--primary btn-nav-login mobile-login';
-    loginBtn.innerHTML = `<img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
+    loginBtn.innerHTML = `<img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" 
+      style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
     mobileLoginLi.appendChild(loginBtn);
   }
 }
 
-// INIT APP
+
+// === 4. INITIALIZATION ===
 document.addEventListener('DOMContentLoaded', function () {
   initializeTheme();
   fetchAndRenderCars();
@@ -88,108 +98,47 @@ document.addEventListener('DOMContentLoaded', function () {
   setupSmoothScroll();
 });
 
-// FETCH CARS FROM BACKEND
+
+// === 5. FETCH & RENDER CARS ===
 async function fetchAndRenderCars(filter = 'all') {
-    const carsContainer = document.getElementById('cars-container');
-    if (!carsContainer) return;
+  const carsContainer = document.getElementById('cars-container');
+  if (!carsContainer) return;
 
-    const loadingHTML = `
-  <div class="loading-container">
-    <div class="loading-spinner">
-      <div></div><div></div><div></div><div></div>
-      <div></div><div></div><div></div><div></div>
-      <div></div><div></div><div></div><div></div>
+  const loadingHTML = `
+    <div class="loading-container">
+      <div class="loading-spinner">
+        <div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <p class="loading-text">Loading cars...</p>
     </div>
-    <p class="loading-text">Loading cars...</p>
-  </div>
-`;
+  `;
+  carsContainer.innerHTML = loadingHTML;
 
-    carsContainer.innerHTML = loadingHTML;
-    
-    try {
-        const url = new URL(`${API_BASE_URL}/api/cars`);
-        if (filter !== 'all') {
-            url.searchParams.set('category', filter);
-        }
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/cars${filter !== 'all' ? `?category=${filter}` : ''}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const cars = await response.json();
 
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-        const cars = await response.json();
-
-        if (cars.length === 0) {
-            carsContainer.innerHTML = `<p class="empty-state">No cars found in this category.</p>`;
-            return;
-        }
-
-        carsContainer.innerHTML = ''; // Clear loader
-
-        cars.forEach((car, index) => {
-            const carCard = document.createElement('div');
-            carCard.className = 'car-card';
-
-            // Conditional logic for fuel/electric/hybrid specs
-            let fuelSpec = `<span class="spec-item">⛽ ${car.specs?.fuel || 'N/A'}</span>`;
-            if (car.category === 'electric') {
-                fuelSpec = `<span class="spec-item">⚡ Electric</span>`;
-            } else if (car.specs?.fuel === 'hybrid') {
-                fuelSpec = `<span class="spec-item">🔋 Hybrid</span>`;
-            }
-
-            const carSpecsHTML = `
-                <div class="car-card__specs">
-                    ${fuelSpec}
-                    <span class="spec-item">⚙️ ${car.specs?.transmission || 'N/A'}</span>
-                    <span class="spec-item">👥 ${car.specs?.seats || 'N/A'} seats</span>
-                </div>
-            `;
-
-            const featuresHTML = car.features && car.features.length > 0 
-                ? `
-                <div class="car-card__features-section">
-                    <h4 class="car-card__features-label">Features:</h4>
-                    <div class="car-card__features-tags">
-                        ${car.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
-                    </div>
-                </div>` 
-                : '';
-
-            const imageHTML = `
-                <div class="car-card__image">
-                    <img src="${car.imageUrl}" alt="${car.name}" loading="lazy">
-                </div>
-            `;
-
-            carCard.innerHTML = `
-    <div class="car-card__image">
-        <img src="${car.imageUrl}" alt="${car.name}" loading="lazy">
-    </div>
-    <div class="car-card__content">
-        <div class="car-card__header">
-            <h3 class="car-card__name">${car.name}</h3>
-            <span class="car-card__brand-tag">${car.brand}</span>
-        </div>
-        <div class="car-card__price">₹${car.pricePerDay.toLocaleString('en-IN')}/day</div>
-        
-        ${carSpecsHTML}
-        ${featuresHTML}
-        
-        <button class="btn btn--primary car-card__book" data-car-id="${car._id}">Book Now</button>
-    </div>
-`;
-            
-            carCard.style.animationDelay = `${index * 100}ms`;
-            carsContainer.appendChild(carCard);
-        });
-
-    } catch (error) {
-        console.error('Error fetching cars:', error);
-        carsContainer.innerHTML = `<p class="error-state">Failed to load cars. Please try again later.</p>`;
+    carsContainer.innerHTML = '';
+    if (cars.length === 0) {
+      carsContainer.innerHTML = '<div class="loading-container"><p class="loading-text">No cars found in this category.</p></div>';
+    } else {
+      cars.forEach((car, index) => {
+        const card = createCarCard(car);
+        carsContainer.appendChild(card);
+        setTimeout(() => card.classList.add('visible'), index * 50);
+      });
     }
+  } catch (err) {
+    console.error('Failed to fetch cars:', err);
+    carsContainer.innerHTML = '<div class="loading-container"><p class="loading-text error">Failed to load cars. Please try again later.</p></div>';
+  }
 }
 
 
-// CREATE CAR CARD
+// === 6. CAR CARD CREATION ===
 function createCarCard(car) {
   const safePrice = Number(car.pricePerDay) || 0;
   const card = document.createElement('div');
@@ -214,9 +163,9 @@ function createCarCard(car) {
   return card;
 }
 
-// EVENT LISTENERS
+
+// === 7. EVENT LISTENERS ===
 function setupEventListeners() {
-  // Car booking button click
   document.getElementById('cars-container')?.addEventListener('click', (e) => {
     if (e.target.classList.contains('car-card__book')) {
       if (!isUserLoggedIn()) {
@@ -229,7 +178,6 @@ function setupEventListeners() {
     }
   });
 
-  // Filter buttons
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', function () {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -239,29 +187,22 @@ function setupEventListeners() {
     });
   });
 
-  // Booking modal close
   document.getElementById('modal-close')?.addEventListener('click', closeBookingModal);
   document.getElementById('modal-overlay')?.addEventListener('click', closeBookingModal);
 
   ['book-pickup-date', 'book-dropoff-date', 'driver-service', 'gps-service', 'insurance-service']
     .forEach(id => document.getElementById(id)?.addEventListener('change', updateBookingTotal));
 
-  // Booking form submission
   document.getElementById('booking-form')?.addEventListener('submit', handleBookingSubmit);
-
-  // Contact form submission
   document.getElementById('contact-form')?.addEventListener('submit', handleContactSubmit);
 
-  // Escape key closes modal
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeBookingModal();
   });
 
-  // Theme toggles
   if (themeSwitch) themeSwitch.addEventListener('change', toggleTheme);
   if (mobileThemeSwitch) mobileThemeSwitch.addEventListener('change', toggleTheme);
 
-  // Hamburger menu
   const hamburger = document.getElementById('nav-hamburger');
   const navMenuMobile = document.getElementById('nav-menu-mobile');
   if (hamburger && navMenuMobile) {
@@ -279,15 +220,13 @@ function setupEventListeners() {
   }
 }
 
-// MOBILE NAV LINK SCROLL LOGIC (ONLY FOR MOBILE)
+
+// === 8. MOBILE NAV SCROLL ===
 function setupMobileNavScroll() {
   function isMobile() {
-    // Width for mobile breakpoint
     return window.innerWidth <= 768;
   }
   function getHeaderHeight() {
-    // Mobile Header Height 
-    const header = document.getElementById('header');
     return header ? header.offsetHeight : 60;
   }
   document.querySelectorAll('#nav-menu-mobile .nav__link').forEach(link => {
@@ -297,8 +236,7 @@ function setupMobileNavScroll() {
         const section = document.querySelector(hash);
         if (section) {
           e.preventDefault();
-          // Compute correct offset (header height)
-          const y = section.getBoundingClientRect().top + window.pageYOffset - getHeaderHeight() - -3; // -8px visual gap
+          const y = section.getBoundingClientRect().top + window.pageYOffset - getHeaderHeight() - 8;
           window.scrollTo({ top: y, behavior: 'smooth' });
         }
       }
@@ -306,14 +244,15 @@ function setupMobileNavScroll() {
   });
 }
 
-// LOGIN MODAL EVENTS
+
+// === 9. LOGIN MODAL EVENTS ===
 function setupLoginModalEvents() {
-  var modalClose = document.getElementById('login-modal-close');
-  var modalOverlay = document.querySelector('#login-modal .modal__overlay');
+  const modalClose = document.getElementById('login-modal-close');
+  const modalOverlay = document.querySelector('#login-modal .modal__overlay');
   if (modalClose) modalClose.addEventListener('click', closeLoginModal);
   if (modalOverlay) modalOverlay.addEventListener('click', closeLoginModal);
 
-  var googleBtn = document.getElementById('google-login');
+  const googleBtn = document.getElementById('google-login');
   if (googleBtn) {
     googleBtn.addEventListener('click', function () {
       window.location.href = API_BASE_URL + "/api/auth/google";
@@ -321,17 +260,18 @@ function setupLoginModalEvents() {
   }
 }
 
-// BOOKING FORM SUBMIT (MongoDB)
+
+// === 10. BOOKING FORM SUBMIT ===
 async function handleBookingSubmit(e) {
   e.preventDefault();
   if (!isUserLoggedIn()) {
     showPopupMessage("Please login to book a car.");
     return;
   }
+
   const form = e.target;
   const formData = new FormData(form);
 
-  // Strong serialization!
   const bookingData = {
     name: formData.get('name'),
     email: formData.get('email'),
@@ -365,8 +305,8 @@ async function handleBookingSubmit(e) {
       form.reset();
       closeBookingModal();
       showPopupMessage("Booking Confirmed! We'll contact you shortly.");
-      renderMobileAuthButton(); // update Login/Logout in hamburger after booking
-      renderAuthButtons();      // update Login/Logout on desktop
+      renderMobileAuthButton();
+      renderAuthButtons();
     } else {
       if (res.status === 401) { logout(); }
       let errText = 'Booking failed. Please try again.';
@@ -383,7 +323,8 @@ async function handleBookingSubmit(e) {
   }
 }
 
-//  CONTACT FORM SUBMIT (MongoDB)
+
+// === 11. CONTACT FORM SUBMIT ===
 async function handleContactSubmit(e) {
   e.preventDefault();
   const form = e.target;
@@ -418,7 +359,8 @@ async function handleContactSubmit(e) {
   }
 }
 
-// MODAL FUNCTIONS
+
+// === 12. MODAL FUNCTIONS ===
 function openBookingModal(name, price) {
   currentSelectedCar = { name, price: Number(price) || 0 };
   const modal = document.getElementById('booking-modal');
@@ -439,7 +381,6 @@ function closeBookingModal() {
   currentSelectedCar = null;
 }
 
-// UPDATE BOOKING TOTAL
 function updateBookingTotal() {
   if (!currentSelectedCar) return;
   const start = new Date(document.getElementById('book-pickup-date').value);
@@ -461,7 +402,6 @@ function updateBookingTotal() {
   document.getElementById('booking-total').value = total;
 }
 
-// POPUP MESSAGE
 function showPopupMessage(message, isTemporary = true) {
   const popup = document.getElementById('booking-popup');
   if (!popup) return;
@@ -470,7 +410,8 @@ function showPopupMessage(message, isTemporary = true) {
   if (isTemporary) setTimeout(() => popup.classList.remove('visible'), 3000);
 }
 
-// THEME
+
+// === THEME ===
 const themeSwitch = document.getElementById('theme-switch');
 const mobileThemeSwitch = document.getElementById('mobile-theme-switch');
 
@@ -494,7 +435,8 @@ function updateTheme() {
   document.documentElement.setAttribute('data-color-scheme', isDarkMode ? 'dark' : 'light');
 }
 
-// SCROLL EFFECTS
+
+// === SCROLL EFFECTS ===
 function setupScrollEffects() {
   const header = document.getElementById('header');
   window.addEventListener('scroll', () => {
@@ -512,7 +454,8 @@ function setupScrollAnimations() {
   animateElements.forEach(el => observer.observe(el));
 }
 
-// DATE DEFAULTS
+
+// === DATE DEFAULTS ===
 function setDefaultDates() {
   const today = new Date();
   const tomorrow = new Date(today);
@@ -529,17 +472,19 @@ function setDefaultDates() {
   }
 }
 
-// SEARCH BAR
+
+// === 13. SEARCH SETUP ===
 function setupSearch(inputId, resultsId, buttonId) {
   const input = document.getElementById(inputId);
   const resultsContainer = document.getElementById(resultsId);
   const searchButton = document.getElementById(buttonId);
-  let allCars = []; // Cache for all car data
+  let allCars = [];
   let debounceTimer;
 
-  // Fetch all cars once to use for local search suggestions
+  if (!input || !resultsContainer) return;
+
   async function fetchAllCarsForSearch() {
-    if (allCars.length > 0) return; // Use cache if available
+    if (allCars.length > 0) return;
     try {
       const response = await fetch(`${API_BASE_URL}/api/cars`);
       if (!response.ok) throw new Error('Network response was not ok');
@@ -549,7 +494,6 @@ function setupSearch(inputId, resultsId, buttonId) {
     }
   }
 
-  // Display suggestions based on the search query
   function showSuggestions(query) {
     if (!query) {
       resultsContainer.style.display = 'none';
@@ -565,16 +509,12 @@ function setupSearch(inputId, resultsId, buttonId) {
         const item = document.createElement('div');
         item.className = 'search-result-item';
         item.textContent = car.name;
-        // Handle click on a suggestion
         item.addEventListener('click', () => {
           input.value = car.name;
           resultsContainer.style.display = 'none';
-          
-          // Find the corresponding car card and scroll to it
           const carCard = document.querySelector(`.car-card[data-car-name="${car.name}"]`);
           if (carCard) {
             carCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Highlight the card briefly
             carCard.classList.add('highlight');
             setTimeout(() => carCard.classList.remove('highlight'), 2000);
           }
@@ -586,34 +526,31 @@ function setupSearch(inputId, resultsId, buttonId) {
       resultsContainer.style.display = 'none';
     }
   }
-  
-  // Event listener for when the user types
+
   input.addEventListener('input', () => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       showSuggestions(input.value.trim());
-    }, 300); // Debounce to avoid excessive API calls on every keystroke
+    }, 300);
   });
 
-  // Show suggestions when the input is clicked
   input.addEventListener('focus', () => {
     if (input.value.trim()) {
       showSuggestions(input.value.trim());
     }
   });
 
-  // Hide the suggestions when the user clicks anywhere else on the page
   document.addEventListener('click', (event) => {
-    if (!event.target.closest('.search-container')) { // Assumes search bar has a parent with class 'search-container'
+    if (!event.target.closest('.search-container')) {
       resultsContainer.style.display = 'none';
     }
   });
 
-  // Initial fetch of car data when the page loads
   fetchAllCarsForSearch();
 }
 
-// SMOOTH SCROLL FOR FOOTER AND NAV LINKS (MOBILE)
+
+// === SMOOTH SCROLL ===
 function setupSmoothScroll() {
   const scrollLinks = document.querySelectorAll('a[href^="#"]');
   const mobileNav = document.getElementById('nav-menu-mobile');
@@ -621,24 +558,17 @@ function setupSmoothScroll() {
 
   scrollLinks.forEach(link => {
     link.addEventListener('click', function (e) {
-      e.preventDefault(); // Stop the default anchor jump
-
+      e.preventDefault();
       const targetId = this.getAttribute('href');
       const targetElement = document.querySelector(targetId);
-      
       if (targetElement) {
-        // Close mobile nav if it's open
         if (mobileNav && mobileNav.classList.contains('active')) {
           mobileNav.classList.remove('active');
           hamburger.classList.remove('active');
         }
-
-        // Calculate the correct position
-        const headerOffset = window.innerWidth <= 1024 ? 60 : 60; // 1st 60px offset for mobile, 2nd 60px for desktop
+        const headerOffset = window.innerWidth <= 1024 ? 60 : 60;
         const elementPosition = targetElement.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-        // Perform the smooth scroll
         window.scrollTo({
           top: offsetPosition,
           behavior: "smooth"
@@ -649,10 +579,11 @@ function setupSmoothScroll() {
 }
 
 
-// LOGIN MODAL SUPPORT (optional, safe to ignore if not visible)
+// === LOGIN MODAL SUPPORT ===
 function openLoginModal() {
   document.getElementById('login-modal').classList.add('visible');
 }
+
 function closeLoginModal() {
   document.getElementById('login-modal').classList.remove('visible');
 }
