@@ -90,55 +90,93 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // FETCH CARS FROM BACKEND
 async function fetchAndRenderCars(filter = 'all') {
-  const carsContainer = document.getElementById('cars-container');
-  if (!carsContainer) return;
+    const carsContainer = document.getElementById('cars-container');
+    if (!carsContainer) return;
 
-  // HTML for the centered loading spinner
-  const loadingHTML = `
-    <div class="loading-container">
-      <div class="loading-spinner">
-        <div></div><div></div><div></div><div></div>
-        <div></div><div></div><div></div><div></div>
-        <div></div><div></div><div></div><div></div>
-      </div>
-      <p class="loading-text">Loading cars...</p>
+    const loadingHTML = `<div class="loading-state"><div></div><div></div><div></div></div>`;
+    carsContainer.innerHTML = loadingHTML;
+
+    try {
+        const url = new URL(`${API_BASE_URL}/api/cars`);
+        if (filter !== 'all') {
+            url.searchParams.set('category', filter);
+        }
+
+        const response = await fetch(url.toString());
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const cars = await response.json();
+
+        if (cars.length === 0) {
+            carsContainer.innerHTML = `<p class="empty-state">No cars found in this category.</p>`;
+            return;
+        }
+
+        carsContainer.innerHTML = ''; // Clear loader
+
+        cars.forEach((car, index) => {
+            const carCard = document.createElement('div');
+            carCard.className = 'car-card';
+
+            // Conditional logic for fuel/electric/hybrid specs
+            let fuelSpec = `<span class="spec-item">⛽ ${car.specs?.fuel || 'N/A'}</span>`;
+            if (car.category === 'electric') {
+                fuelSpec = `<span class="spec-item">⚡ Electric</span>`;
+            } else if (car.specs?.fuel === 'hybrid') {
+                fuelSpec = `<span class="spec-item">🔋 Hybrid</span>`;
+            }
+
+            const carSpecsHTML = `
+                <div class="car-card__specs">
+                    ${fuelSpec}
+                    <span class="spec-item">⚙️ ${car.specs?.transmission || 'N/A'}</span>
+                    <span class="spec-item">👥 ${car.specs?.seats || 'N/A'} seats</span>
+                </div>
+            `;
+
+            const featuresHTML = car.features && car.features.length > 0 
+                ? `
+                <div class="car-card__features-section">
+                    <h4 class="car-card__features-label">Features:</h4>
+                    <div class="car-card__features-tags">
+                        ${car.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
+                    </div>
+                </div>` 
+                : '';
+
+            const imageHTML = `
+                <div class="car-card__image">
+                    <img src="${car.imageUrl}" alt="${car.name}" loading="lazy">
+                </div>
+            `;
+
+            carCard.innerHTML = `
+    <div class="car-card__image">
+        <img src="${car.imageUrl}" alt="${car.name}" loading="lazy">
     </div>
-  `;
+    <div class="car-card__content">
+        <div class="car-card__header">
+            <h3 class="car-card__name">${car.name}</h3>
+            <span class="car-card__brand-tag">${car.brand}</span>
+        </div>
+        <div class="car-card__price">₹${car.pricePerDay.toLocaleString('en-IN')}/day</div>
+        
+        ${carSpecsHTML}
+        ${featuresHTML}
+        
+        <button class="btn btn--primary car-card__book" data-car-id="${car._id}">Book Now</button>
+    </div>
+`;
+            
+            carCard.style.animationDelay = `${index * 100}ms`;
+            carsContainer.appendChild(carCard);
+        });
 
-  // Show loading indicator
-  carsContainer.innerHTML = loadingHTML;
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/cars`);
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+    } catch (error) {
+        console.error('Error fetching cars:', error);
+        carsContainer.innerHTML = `<p class="error-state">Failed to load cars. Please try again later.</p>`;
     }
-    const cars = await res.json();
-    
-    // Clear the container before rendering cars
-    carsContainer.innerHTML = '';
-
-    const filteredCars = (filter === 'all') ? cars : cars.filter(car => car.category.toLowerCase() === filter.toLowerCase());
-
-    if (filteredCars.length === 0) {
-      // If no cars are found, display a message in the container
-      carsContainer.innerHTML = '<div class="loading-container"><p class="loading-text">No cars found in this category.</p></div>';
-    } else {
-      // Render car cards
-      filteredCars.forEach((car, index) => {
-        const card = createCarCard(car);
-        carsContainer.appendChild(card);
-        setTimeout(() => card.classList.add('visible'), index * 50);
-      });
-    }
-
-  } catch (err) {
-    console.error('Failed to fetch cars:', err);
-    // Display an error message within the container
-    carsContainer.innerHTML = '<div class="loading-container"><p class="loading-text error">Failed to load cars. Please try again later.</p></div>';
-  }
 }
-
 
 
 // CREATE CAR CARD
