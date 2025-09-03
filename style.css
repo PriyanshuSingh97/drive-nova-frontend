@@ -12,6 +12,8 @@
 --color-charcoal-700: rgba(15, 23, 42, 1);
 --color-charcoal-800: rgba(30, 41, 59, 1);
 --color-slate-900: rgba(15, 23, 42, 1);
+--color-vibrant-blue: rgba(37, 99, 235, 1);
+--color-vibrant-blue-darker: rgba(29, 78, 216, 1);
 
 /* New Modern Color Palette */
 --color-primary-50: rgba(240, 249, 255, 1);
@@ -330,18 +332,19 @@ outline: none;
 box-shadow: var(--focus-ring);
 }
 .btn--primary {
-background: linear-gradient(135deg, var(--color-primary), var(--color-primary-600));
-color: var(--color-btn-primary-text);
-font-weight: var(--font-weight-medium);
+  background: var(--color-vibrant-blue); /* Changed to solid blue */
+  color: var(--color-btn-primary-text);
+  font-weight: var(--font-weight-medium);
 }
 .btn--primary:hover {
-background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary-700));
-transform: translateY(-1px);
-box-shadow: var(--shadow-md);
+  background: var(--color-vibrant-blue-darker); /* Darker blue on hover */
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
+
 .btn--primary:active {
-background: var(--color-primary-active);
-transform: translateY(0);
+  background: rgba(30, 64, 175, 1); /* Darkest blue for active */
+  transform: translateY(0);
 }
 .btn--secondary {
 background: var(--color-secondary);
@@ -966,10 +969,10 @@ transform: translateY(-2px);
 box-shadow: var(--shadow-md);
 }
 .filter-btn.active {
-background: linear-gradient(135deg, var(--color-primary), var(--color-primary-600));
-color: var(--color-btn-primary-text);
-border-color: var(--color-primary);
-box-shadow: var(--shadow-md);
+  background: var(--color-vibrant-blue);
+  color: var(--color-btn-primary-text);
+  border-color: var(--color-vibrant-blue);
+  box-shadow: var(--shadow-md);
 }
 .fleet__grid {
 display: grid;
@@ -1030,10 +1033,10 @@ color: var(--color-text);
 margin: 0;
 }
 .car-card__price {
-font-size: var(--font-size-lg);
-font-weight: var(--font-weight-bold);
-color: var(--color-primary);
-text-align: right;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-vibrant-blue);
+  text-align: right;
 }
 .car-card__plate {
 background: linear-gradient(135deg, var(--color-bg-8), var(--color-bg-1));
