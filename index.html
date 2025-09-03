@@ -71,7 +71,7 @@
                       <input type="text" id="hero-search-input" placeholder="Search cars..." class="search-input">
                       <button id="hero-search-button" class="btn btn--search">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 19 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                         </svg>
                       </button>
@@ -179,7 +179,6 @@
             </div>
         </div>
     </section>
-
 <!-- Contact Section -->
 <section class="contact" id="contact">
     <div class="container">
@@ -233,6 +232,28 @@
         </div>
     </div>
 </section>
+
+<!-- Login Modal (NEW) -->
+<div class="modal hidden" id="login-modal">
+    <div class="modal__overlay" id="login-modal-overlay"></div>
+    <div class="modal__content login-modal-content">
+        <div class="modal__header">
+            <h2>Login to DriveNova</h2>
+            <button class="modal__close" id="login-modal-close">&times;</button>
+        </div>
+        <p>Please select your preferred login method to continue.</p>
+        <div class="login-options">
+            <a href="https://drivenova-backend.onrender.com/api/auth/google" class="login-option">
+                <img src="https://www.google.com/favicon.ico" alt="Google logo">
+                <span>Continue with Google</span>
+            </a>
+            <a href="https://drivenova-backend.onrender.com/api/auth/github" class="login-option">
+                <img src="https://github.githubassets.com/favicons/favicon.png" alt="GitHub logo">
+                <span>Continue with GitHub</span>
+            </a>
+        </div>
+    </div>
+</div>
 
 <!-- Booking Modal -->
 <div class="modal hidden" id="booking-modal">
