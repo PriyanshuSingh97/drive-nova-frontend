@@ -145,10 +145,38 @@ async function fetchAndRenderCars(filter = 'all') {
 // CAR CARD CREATION
 function createCarCard(car) {
   const safePrice = Number(car.pricePerDay) || 0;
+
+  // Conditional logic for fuel/electric/hybrid specs
+  let fuelSpec = `<span class="spec-item">⛽ ${car.specs?.fuel || 'N/A'}</span>`;
+  if (car.category === 'electric') {
+    fuelSpec = `<span class="spec-item">⚡ Electric</span>`;
+  } else if (car.specs?.fuel === 'hybrid') {
+    fuelSpec = `<span class="spec-item">🔋 Hybrid</span>`;
+  }
+
+  const carSpecsHTML = `
+    <div class="car-card__specs">
+      ${fuelSpec}
+      <span class="spec-item">⚙️ ${car.specs?.transmission || 'N/A'}</span>
+      <span class="spec-item">👥 ${car.specs?.seats || 'N/A'} seats</span>
+    </div>
+  `;
+
+  const featuresHTML = car.features && car.features.length > 0
+    ? `
+      <div class="car-card__features-section">
+        <h4 class="car-card__features-label">Features:</h4>
+        <div class="car-card__features-tags">
+          ${car.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
+        </div>
+      </div>`
+    : '';
+
   const card = document.createElement('div');
   card.className = 'car-card';
   card.setAttribute('data-animate', 'true');
   card.setAttribute('data-car-name', car.name);
+
   card.innerHTML = `
     <div class="car-card__image">
       <img src="${car.imageUrl}" alt="${car.name}" loading="lazy">
@@ -156,12 +184,14 @@ function createCarCard(car) {
     <div class="car-card__content">
       <div class="car-card__header">
         <h3 class="car-card__name">${car.name}</h3>
-        <div class="car-card__price">₹${safePrice.toLocaleString()}<br><small>per day</small></div>
+        <span class="car-card__brand-tag">${car.brand}</span>
       </div>
-      <div class="car-card__features">
-        ${(Array.isArray(car.features) ? car.features : []).map(f => `<span class="feature-tag">${f}</span>`).join('')}
-      </div>
-      <button class="btn btn--primary car-card__book" data-car-name="${car.name}" data-car-price="${safePrice}">Book Now</button>
+      <div class="car-card__price">₹${safePrice.toLocaleString()} per day</div>
+      ${carSpecsHTML}
+      ${featuresHTML}
+      <button class="btn btn--primary car-card__book" 
+        data-car-name="${car.name}" 
+        data-car-price="${safePrice}">Book Now</button>
     </div>
   `;
   return card;
