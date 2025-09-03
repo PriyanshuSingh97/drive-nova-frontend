@@ -141,24 +141,18 @@ async function fetchAndRenderCars(filter = 'all') {
   }
 }
 
-
 // CAR CARD CREATION
 function createCarCard(car) {
   const safePrice = Number(car.pricePerDay) || 0;
 
-  // Conditional logic for fuel/electric/hybrid specs
-  let fuelSpec = `<span class="spec-item">⛽ ${car.specs?.fuel || 'N/A'}</span>`;
-  if (car.category === 'electric') {
-    fuelSpec = `<span class="spec-item">⚡ Electric</span>`;
-  } else if (car.specs?.fuel === 'hybrid') {
-    fuelSpec = `<span class="spec-item">🔋 Hybrid</span>`;
-  }
+  // Default specs if not provided in the data
+  const specs = car.specs || { fuel: 'N/A', transmission: 'N/A', seats: 'N/A' };
 
   const carSpecsHTML = `
     <div class="car-card__specs">
-      ${fuelSpec}
-      <span class="spec-item">⚙️ ${car.specs?.transmission || 'N/A'}</span>
-      <span class="spec-item">👥 ${car.specs?.seats || 'N/A'} seats</span>
+      <span class="spec-item">⛽ ${specs.fuel}</span>
+      <span class="spec-item">⚙️ ${specs.transmission}</span>
+      <span class="spec-item">👥 ${specs.seats} seats</span>
     </div>
   `;
 
@@ -190,12 +184,13 @@ function createCarCard(car) {
       ${carSpecsHTML}
       ${featuresHTML}
       <button class="btn btn--primary car-card__book" 
-        data-car-name="${car.name}" 
-        data-car-price="${safePrice}">Book Now</button>
+              data-car-name="${car.name}" 
+              data-car-price="${safePrice}">Book Now</button>
     </div>
   `;
   return card;
 }
+
 
 
 // EVENT LISTENERS
