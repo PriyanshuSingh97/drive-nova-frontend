@@ -1,163 +1,193 @@
-// STORE JWT TOKEN IMMEDIATELY 
-(function saveTokenFromUrlImmediately() { 
-  const params = new URLSearchParams(window.location.search); 
-  const token = params.get('token'); 
-  if (token) { 
-    localStorage.setItem('jwt_token', token); 
-    window.history.replaceState({}, document.title, window.location.pathname); 
-  } 
-})(); 
+// app.js
 
-const API_BASE_URL = "https://drivenova-backend.onrender.com"; 
-let currentFilter = 'all'; 
-let isDarkMode = false; 
-let currentSelectedCar = null; 
+// STORE JWT TOKEN IMMEDIATELY
+(function saveTokenFromUrlImmediately() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (token) {
+    localStorage.setItem('jwt_token', token);
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+})();
 
-// AUTH HELPERS 
-function authHeaders() { 
-  const token = localStorage.getItem('jwt_token'); 
-  return token ? { Authorization: `Bearer ${token}` } : {}; 
-} 
 
-function isUserLoggedIn() { 
-  return !!localStorage.getItem('jwt_token'); 
-} 
+const API_BASE_URL = "https://drivenova-backend.onrender.com";
 
-function logout() { 
-  localStorage.removeItem('jwt_token'); 
-  renderAuthButtons(); 
-  renderMobileAuthButton(); 
-  showPopupMessage("Logged out successfully."); 
-} 
 
-// RENDERING AUTH BUTTONS DESKTOP 
-function renderAuthButtons() { 
-  const desktopLoginLi = document.getElementById('nav-menu-desktop-login'); 
-  if (!desktopLoginLi) return; 
-  desktopLoginLi.innerHTML = ''; 
-  if (isUserLoggedIn()) { 
-    const logoutBtn = document.createElement('button'); 
-    logoutBtn.textContent = 'Logout'; 
-    logoutBtn.className = 'btn btn--primary btn-nav-login'; 
-    logoutBtn.onclick = logout; 
-    desktopLoginLi.appendChild(logoutBtn); 
-  } else { 
-    // Login/Signup button
-    const loginBtn = document.createElement('button'); 
-    loginBtn.textContent = 'Login/Signup'; 
-    loginBtn.className = 'btn btn--primary btn-nav-login'; 
-    loginBtn.onclick = openLoginModal; 
-    desktopLoginLi.appendChild(loginBtn); 
-  } 
-} 
+let currentFilter = 'all';
+let isDarkMode = false;
+let currentSelectedCar = null;
 
-// RENDERING AUTH BUTTONS MOBILE 
-function renderMobileAuthButton() { 
-  const mobileLoginLi = document.getElementById('nav-menu-mobile-login'); 
-  if (!mobileLoginLi) return; 
-  mobileLoginLi.innerHTML = ''; 
-  if (isUserLoggedIn()) { 
-    const logoutBtn = document.createElement('button'); 
-    logoutBtn.textContent = 'Logout'; 
-    logoutBtn.className = 'btn btn--primary btn-nav-login mobile-login'; 
-    logoutBtn.onclick = function () { 
-      logout(); 
-      document.getElementById('nav-menu-mobile').classList.remove('active'); 
-      document.getElementById('nav-hamburger').classList.remove('active'); 
-    }; 
-    mobileLoginLi.appendChild(logoutBtn); 
-  } else { 
-    // Login/Signup button for mobile
-    const loginBtn = document.createElement('button'); 
-    loginBtn.textContent = 'Login/Signup'; 
-    loginBtn.className = 'btn btn--primary btn-nav-login mobile-login'; 
-    loginBtn.onclick = openLoginModal; 
-    mobileLoginLi.appendChild(loginBtn); 
-  } 
+
+// AUTH HELPERS
+function authHeaders() {
+  const token = localStorage.getItem('jwt_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
+
+
+function isUserLoggedIn() {
+  return !!localStorage.getItem('jwt_token');
+}
+
+
+function logout() {
+  localStorage.removeItem('jwt_token');
+  renderAuthButtons();
+  renderMobileAuthButton();
+  showPopupMessage("Logged out successfully.");
+}
+
+
+// RENDERING AUTH BUTTONS DESKTOP
+function renderAuthButtons() {
+  const desktopLoginLi = document.getElementById('nav-menu-desktop-login');
+  if (!desktopLoginLi) return;
+  desktopLoginLi.innerHTML = '';
+
+
+  if (isUserLoggedIn()) {
+    const logoutBtn = document.createElement('button');
+    logoutBtn.textContent = 'Logout';
+    logoutBtn.className = 'btn btn--primary btn-nav-login';
+    logoutBtn.onclick = logout;
+    desktopLoginLi.appendChild(logoutBtn);
+  } else {
+    const loginBtn = document.createElement('button');
+    loginBtn.textContent = 'Login/Signup';
+    loginBtn.className = 'btn btn--primary btn-nav-login';
+    loginBtn.onclick = openLoginModal;
+    desktopLoginLi.appendChild(loginBtn);
+  }
+}
+
+
+// RENDERING AUTH BUTTONS MOBILE
+function renderMobileAuthButton() {
+  const mobileLoginLi = document.getElementById('nav-menu-mobile-login');
+  if (!mobileLoginLi) return;
+  mobileLoginLi.innerHTML = '';
+
+
+  if (isUserLoggedIn()) {
+    const logoutBtn = document.createElement('button');
+    logoutBtn.textContent = 'Logout';
+    logoutBtn.className = 'btn btn--primary btn-nav-login mobile-login';
+    logoutBtn.onclick = function () {
+      logout();
+      document.getElementById('nav-menu-mobile').classList.remove('active');
+      document.getElementById('nav-hamburger').classList.remove('active');
+    };
+    mobileLoginLi.appendChild(logoutBtn);
+  } else {
+    const loginBtn = document.createElement('button');
+    loginBtn.textContent = 'Login/Signup';
+    loginBtn.className = 'btn btn--primary btn-nav-login mobile-login';
+    loginBtn.onclick = openLoginModal;
+    mobileLoginLi.appendChild(loginBtn);
+  }
+}
+
 
 // AUTH TAB SWITCHING
 function showAuthTab(tab) {
-    // Update tab buttons
-    document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.auth-tab[onclick="showAuthTab('${tab}')"]`).classList.add('active');
-    
-    // Update forms
-    document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
-    document.getElementById(`${tab}-form`).classList.add('active');
+  document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.auth-tab[onclick="showAuthTab('${tab}')"]`).classList.add('active');
+  document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+  document.getElementById(`${tab}-form`).classList.add('active');
 }
+
 
 // EMAIL LOGIN
 async function handleEmailLogin(event) {
-    event.preventDefault();
-    
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            localStorage.setItem('jwt_token', data.token);
-            closeLoginModal();
-            renderAuthButtons();
-            renderMobileAuthButton();
-            showPopupMessage('Login successful!');
-        } else {
-            showPopupMessage(data.error || 'Login failed');
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        showPopupMessage('Login failed. Please try again.');
+  event.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await response.json();
+    if (response.ok) {
+      localStorage.setItem('jwt_token', data.token);
+      closeLoginModal();
+      renderAuthButtons();
+      renderMobileAuthButton();
+      showPopupMessage('Login successful!');
+      // --- FIX: Check for pending booking after login ---
+      if (currentSelectedCar) {
+        openBookingModal(currentSelectedCar.name, currentSelectedCar.pricePerDay);
+      }
+      // --- END FIX ---
+    } else {
+      showPopupMessage(data.error || 'Login failed');
     }
+  } catch (error) {
+    console.error('Login error:', error);
+    showPopupMessage('Login failed. Please try again.');
+  }
 }
+
 
 // EMAIL REGISTRATION
 async function handleEmailRegister(event) {
-    event.preventDefault();
-    
-    const username = document.getElementById('register-username').value;
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    
-    if (password.length < 6) {
-        showPopupMessage('Password must be at least 6 characters long');
-        return;
+  event.preventDefault();
+  const username = document.getElementById('register-username').value;
+  const email = document.getElementById('register-email').value;
+  const password = document.getElementById('register-password').value;
+
+
+  if (password.length < 6) {
+    showPopupMessage('Password must be at least 6 characters long');
+    return;
+  }
+
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password })
+    });
+    const data = await response.json();
+    if (response.ok) {
+      localStorage.setItem('jwt_token', data.token);
+      closeLoginModal();
+      renderAuthButtons();
+      renderMobileAuthButton();
+      showPopupMessage('Registration successful!');
+      // --- FIX: Check for pending booking after registration ---
+      if (currentSelectedCar) {
+        openBookingModal(currentSelectedCar.name, currentSelectedCar.pricePerDay);
+      }
+      // --- END FIX ---
+    } else {
+      showPopupMessage(data.error || 'Registration failed');
     }
-    
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, email, password })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            localStorage.setItem('jwt_token', data.token);
-            closeLoginModal();
-            renderAuthButtons();
-            renderMobileAuthButton();
-            showPopupMessage('Registration successful!');
-        } else {
-            showPopupMessage(data.error || 'Registration failed');
-        }
-    } catch (error) {
-        console.error('Registration error:', error);
-        showPopupMessage('Registration failed. Please try again.');
-    }
+  } catch (error) {
+    console.error('Registration error:', error);
+    showPopupMessage('Registration failed. Please try again.');
+  }
 }
+
+// --- FIX: New function to handle the booking click, which centralizes the logic ---
+function handleBookNowClick(car) {
+  // Store the selected car globally, so we can access it after login.
+  currentSelectedCar = car;
+  if (!isUserLoggedIn()) {
+    showPopupMessage("Please login to book a car.");
+    openLoginModal(); // If not logged in, show the login modal.
+  } else {
+    // If already logged in, proceed directly to booking.
+    openBookingModal(car.name, car.pricePerDay);
+  }
+}
+// --- END FIX ---
+
 
 // INITIALIZATION
 document.addEventListener('DOMContentLoaded', function () {
@@ -173,12 +203,30 @@ document.addEventListener('DOMContentLoaded', function () {
   setupLoginModalEvents();
   setupMobileNavScroll();
   setupSmoothScroll();
+  
+  // --- FIX: Check for a pending booking after OAuth redirect ---
+  const pendingCarJSON = sessionStorage.getItem('pending_booking_car');
+  if (pendingCarJSON && isUserLoggedIn()) {
+    try {
+        const pendingCar = JSON.parse(pendingCarJSON);
+        if(pendingCar && pendingCar.name && pendingCar.pricePerDay) {
+            openBookingModal(pendingCar.name, pendingCar.pricePerDay);
+        }
+    } catch(e) {
+        console.error("Error parsing pending car from sessionStorage", e);
+    } finally {
+        sessionStorage.removeItem('pending_booking_car'); // Clean up
+    }
+  }
+  // --- END FIX ---
 });
+
 
 // FETCH & RENDER CARS
 async function fetchAndRenderCars(filter = 'all') {
   const carsContainer = document.getElementById('cars-container');
   if (!carsContainer) return;
+
 
   // HTML for the loading spinner
   const loadingHTML = `
@@ -192,13 +240,16 @@ async function fetchAndRenderCars(filter = 'all') {
     </div>
   `;
 
+
   // Show loading indicator
   carsContainer.innerHTML = loadingHTML;
+
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/cars${filter !== 'all' ? `?category=${filter}` : ''}`);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const cars = await response.json();
+
 
     carsContainer.innerHTML = '';
     if (cars.length === 0) {
@@ -207,7 +258,9 @@ async function fetchAndRenderCars(filter = 'all') {
     } else {
       // Render car cards
       cars.forEach((car, index) => {
+        // --- FIX: Pass the full car object to createCarCard ---
         const card = createCarCard(car);
+        // --- END FIX ---
         carsContainer.appendChild(card);
         setTimeout(() => card.classList.add('visible'), index * 50);
       });
@@ -215,17 +268,21 @@ async function fetchAndRenderCars(filter = 'all') {
   } catch (err) {
     console.error('Failed to fetch cars:', err);
 
+
     // Display an error message within the container
     carsContainer.innerHTML = '<div class="loading-container"><p class="loading-text error">Failed to load cars. Please try again later.</p></div>';
   }
 }
 
+
 // CAR CARD CREATION
 function createCarCard(car) {
   const safePrice = Number(car.pricePerDay) || 0;
 
+
   // Default specs if not provided in the data
   const specs = car.specs || { fuel: 'N/A', transmission: 'N/A', seats: 'N/A' };
+
 
   const carSpecsHTML = `
     <div class="car-card__specs">
@@ -234,6 +291,7 @@ function createCarCard(car) {
       <span class="spec-item">👥 ${specs.seats} seats</span>
     </div>
   `;
+
 
   const featuresHTML = car.features && car.features.length > 0
     ? `
@@ -245,11 +303,14 @@ function createCarCard(car) {
       </div>`
     : '';
 
+
   const card = document.createElement('div');
   card.className = 'car-card';
   card.setAttribute('data-animate', 'true');
   card.setAttribute('data-car-name', car.name);
 
+
+  // --- FIX: Use onclick to call the new handler function, passing the entire car object ---
   card.innerHTML = `
     <div class="car-card__image">
       <img src="${car.imageUrl}" alt="${car.name}" loading="lazy">
@@ -262,29 +323,21 @@ function createCarCard(car) {
       <div class="car-card__price">₹${safePrice.toLocaleString()} per day</div>
       ${carSpecsHTML}
       ${featuresHTML}
-      <button class="btn btn--primary car-card__book" 
-              data-car-name="${car.name}" 
-              data-car-price="${safePrice}">Book Now</button>
+      <button class="btn btn--primary car-card__book" onclick='handleBookNowClick(${JSON.stringify(car)})'>Book Now</button>
     </div>
   `;
+  // --- END FIX ---
   return card;
 }
+
 
 // EVENT LISTENERS
 function setupEventListeners() {
 
-  // Car booking button click
-  document.getElementById('cars-container')?.addEventListener('click', (e) => {
-    if (e.target.classList.contains('car-card__book')) {
-      if (!isUserLoggedIn()) {
-        showPopupMessage("Please login to book a car.");
-        return;
-      }
-      const name = e.target.getAttribute('data-car-name');
-      const price = parseInt(e.target.getAttribute('data-car-price')) || 0;
-      openBookingModal(name, price);
-    }
-  });
+
+  // --- FIX: The car booking logic is now handled by the inline onclick, so the container event listener is no longer needed. ---
+  // document.getElementById('cars-container')?.addEventListener('click', ...);
+
 
   // Filter buttons
   document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -296,15 +349,19 @@ function setupEventListeners() {
     });
   });
 
+
   // Booking modal close
   document.getElementById('modal-close')?.addEventListener('click', closeBookingModal);
   document.getElementById('modal-overlay')?.addEventListener('click', closeBookingModal);
 
+
   ['book-pickup-date', 'book-dropoff-date', 'driver-service', 'gps-service', 'insurance-service']
     .forEach(id => document.getElementById(id)?.addEventListener('change', updateBookingTotal));
 
+
   document.getElementById('booking-form')?.addEventListener('submit', handleBookingSubmit); // Booking form submission
   document.getElementById('contact-form')?.addEventListener('submit', handleContactSubmit); // Contact form submission
+
 
   document.addEventListener('keydown', (e) => { // Escape key closes modal
     if (e.key === 'Escape') {
@@ -313,9 +370,13 @@ function setupEventListeners() {
     }
   });
 
+
   // Theme toggles
+  const themeSwitch = document.getElementById('theme-switch');
+  const mobileThemeSwitch = document.getElementById('mobile-theme-switch');
   if (themeSwitch) themeSwitch.addEventListener('change', toggleTheme);
   if (mobileThemeSwitch) mobileThemeSwitch.addEventListener('change', toggleTheme);
+
 
   // Hamburger menu
   const hamburger = document.getElementById('nav-hamburger');
@@ -335,8 +396,10 @@ function setupEventListeners() {
   }
 }
 
+
 // MOBILE NAV SCROLL
 function setupMobileNavScroll() {
+  const header = document.getElementById('header');
   function isMobile() {
     return window.innerWidth <= 768;
   }
@@ -358,12 +421,14 @@ function setupMobileNavScroll() {
   });
 }
 
+
 // LOGIN MODAL EVENTS
 function setupLoginModalEvents() {
   const modalClose = document.getElementById('login-modal-close');
   const modalOverlay = document.querySelector('#login-modal .modal__overlay');
   if (modalClose) modalClose.addEventListener('click', closeLoginModal);
   if (modalOverlay) modalOverlay.addEventListener('click', closeLoginModal);
+
 
   // Email login form
   const loginForm = document.getElementById('email-login-form');
@@ -377,22 +442,33 @@ function setupLoginModalEvents() {
       registerForm.addEventListener('submit', handleEmailRegister);
   }
 
+
+  // --- FIX: Store pending booking in sessionStorage for OAuth redirects ---
   // Handle Google Login
   const googleBtn = document.getElementById('google-login');
   if (googleBtn) {
     googleBtn.addEventListener('click', function () {
+      if (currentSelectedCar) {
+        sessionStorage.setItem('pending_booking_car', JSON.stringify(currentSelectedCar));
+      }
       window.location.href = API_BASE_URL + "/api/auth/google";
     });
   }
+
 
   // Handle GitHub Login
   const githubBtn = document.getElementById('github-login');
   if (githubBtn) {
     githubBtn.addEventListener('click', function () {
+      if (currentSelectedCar) {
+        sessionStorage.setItem('pending_booking_car', JSON.stringify(currentSelectedCar));
+      }
       window.location.href = API_BASE_URL + "/api/auth/github";
     });
   }
+  // --- END FIX ---
 }
+
 
 // LOGIN MODAL FUNCTIONS
 function openLoginModal() {
@@ -403,6 +479,7 @@ function openLoginModal() {
   }
 }
 
+
 function closeLoginModal() {
   const loginModal = document.getElementById('login-modal');
   if (loginModal) {
@@ -410,6 +487,7 @@ function closeLoginModal() {
     document.body.style.overflow = 'auto';
   }
 }
+
 
 // BOOKING FORM SUBMIT
 async function handleBookingSubmit(e) {
@@ -419,8 +497,10 @@ async function handleBookingSubmit(e) {
     return;
   }
 
+
   const form = e.target;
   const formData = new FormData(form);
+
 
   const bookingData = {
     name: formData.get('name'),
@@ -435,9 +515,11 @@ async function handleBookingSubmit(e) {
     total_amount: Number(formData.get('total_amount'))
   };
 
+
   const formStatus = document.getElementById('form-status');
   formStatus.textContent = 'Sending booking...';
   formStatus.style.color = '#ffa500';
+
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/bookings`, {
@@ -448,6 +530,7 @@ async function handleBookingSubmit(e) {
       },
       body: JSON.stringify(bookingData),
     });
+
 
     if (res.ok) {
       formStatus.textContent = 'Booking Confirmed!';
@@ -473,6 +556,7 @@ async function handleBookingSubmit(e) {
   }
 }
 
+
 // CONTACT FORM SUBMIT
 async function handleContactSubmit(e) {
   e.preventDefault();
@@ -480,8 +564,10 @@ async function handleContactSubmit(e) {
   const formData = new FormData(form);
   const contactData = Object.fromEntries(formData);
 
+
   // Show loading message
   showPopupMessage("Sending message...", false);
+
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/contact`, {
@@ -489,6 +575,7 @@ async function handleContactSubmit(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(contactData),
     });
+
 
     if (res.ok) {
       form.reset();
@@ -502,11 +589,15 @@ async function handleContactSubmit(e) {
   }
 }
 
+
 // MODAL FUNCTIONS
 function openBookingModal(name, price) {
-  currentSelectedCar = { name, price: Number(price) || 0 };
+  // Use the globally stored car if available, otherwise use passed params
+  const carToBook = currentSelectedCar || { name, price: Number(price) || 0 };
+  currentSelectedCar = carToBook; // ensure it's set for updateBookingTotal
+
   const modal = document.getElementById('booking-modal');
-  document.getElementById('book-car').value = name;
+  document.getElementById('book-car').value = carToBook.name;
   setDefaultDates();
   updateBookingTotal();
   modal.classList.remove('hidden');
@@ -514,14 +605,16 @@ function openBookingModal(name, price) {
   document.body.style.overflow = 'hidden';
 }
 
+
 function closeBookingModal() {
   const modal = document.getElementById('booking-modal');
   modal.classList.remove('visible');
   modal.classList.add('hidden');
   document.getElementById('booking-form')?.reset();
   document.body.style.overflow = 'auto';
-  currentSelectedCar = null;
+  currentSelectedCar = null; // Reset the car after booking/closing
 }
+
 
 // UPDATE BOOKING TOTAL
 function updateBookingTotal() {
@@ -529,21 +622,25 @@ function updateBookingTotal() {
   const start = new Date(document.getElementById('book-pickup-date').value);
   const end = new Date(document.getElementById('book-dropoff-date').value);
 
+
   if (isNaN(start) || isNaN(end) || end <= start) {
     document.getElementById('booking-total-display').textContent = '₹0';
     document.getElementById('booking-total').value = '0';
     return;
   }
 
+
   const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-  let total = currentSelectedCar.price * days;
+  let total = (Number(currentSelectedCar.pricePerDay) || Number(currentSelectedCar.price)) * days;
   if (document.getElementById('driver-service')?.checked) total += 1500 * days;
   if (document.getElementById('gps-service')?.checked) total += 500 * days;
   if (document.getElementById('insurance-service')?.checked) total += 500 * days;
 
+
   document.getElementById('booking-total-display').textContent = `₹${total.toLocaleString()}`;
   document.getElementById('booking-total').value = total;
 }
+
 
 // POPUP MESSAGE
 function showPopupMessage(message, isTemporary = true) {
@@ -554,9 +651,11 @@ function showPopupMessage(message, isTemporary = true) {
   if (isTemporary) setTimeout(() => popup.classList.remove('visible'), 3000);
 }
 
+
 // THEME
 const themeSwitch = document.getElementById('theme-switch');
 const mobileThemeSwitch = document.getElementById('mobile-theme-switch');
+
 
 function initializeTheme() {
   const savedTheme = localStorage.getItem('drivenova-theme');
@@ -566,6 +665,7 @@ function initializeTheme() {
   if (mobileThemeSwitch) mobileThemeSwitch.checked = isDarkMode;
 }
 
+
 function toggleTheme() {
   isDarkMode = !isDarkMode;
   updateTheme();
@@ -574,9 +674,11 @@ function toggleTheme() {
   if (mobileThemeSwitch) mobileThemeSwitch.checked = isDarkMode;
 }
 
+
 function updateTheme() {
   document.documentElement.setAttribute('data-color-scheme', isDarkMode ? 'dark' : 'light');
 }
+
 
 // SCROLL EFFECTS
 function setupScrollEffects() {
@@ -585,6 +687,7 @@ function setupScrollEffects() {
     header?.classList.toggle('scrolled', window.scrollY > 100);
   });
 }
+
 
 function setupScrollAnimations() {
   const animateElements = document.querySelectorAll('[data-animate]');
@@ -596,12 +699,14 @@ function setupScrollAnimations() {
   animateElements.forEach(el => observer.observe(el));
 }
 
+
 // DATE DEFAULTS
 function setDefaultDates() {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
   const format = (d) => d.toISOString().split('T')[0];
+
 
   const pickup = document.getElementById('book-pickup-date');
   const dropoff = document.getElementById('book-dropoff-date');
@@ -613,6 +718,7 @@ function setDefaultDates() {
   }
 }
 
+
 // SEARCH BAR
 function setupSearch(inputId, resultsId, buttonId) {
   const input = document.getElementById(inputId);
@@ -621,7 +727,9 @@ function setupSearch(inputId, resultsId, buttonId) {
   let allCars = []; // Cache for all car data
   let debounceTimer;
 
+
   if (!input || !resultsContainer) return;
+
 
   // Fetch all cars once to use for local search suggestions
   async function fetchAllCarsForSearch() {
@@ -635,6 +743,7 @@ function setupSearch(inputId, resultsId, buttonId) {
     }
   }
 
+
   // Display suggestions based on the search query
   function showSuggestions(query) {
     if (!query) {
@@ -645,6 +754,7 @@ function setupSearch(inputId, resultsId, buttonId) {
       car.name.toLowerCase().includes(query.toLowerCase())
     );
 
+
     resultsContainer.innerHTML = '';
     if (filteredCars.length > 0) {
       filteredCars.forEach(car => {
@@ -652,15 +762,18 @@ function setupSearch(inputId, resultsId, buttonId) {
         item.className = 'search-result-item';
         item.textContent = car.name;
 
+
         // Handle click on a suggestion
         item.addEventListener('click', () => {
           input.value = car.name;
           resultsContainer.style.display = 'none';
 
+
           // Find the corresponding car card and scroll to it
           const carCard = document.querySelector(`.car-card[data-car-name="${car.name}"]`);
           if (carCard) {
             carCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
 
             // Highlight the card briefly
             carCard.classList.add('highlight');
@@ -675,6 +788,7 @@ function setupSearch(inputId, resultsId, buttonId) {
     }
   }
 
+
   // Event listener for when the user types
   input.addEventListener('input', () => {
     clearTimeout(debounceTimer);
@@ -683,12 +797,14 @@ function setupSearch(inputId, resultsId, buttonId) {
     }, 300); // Debounce to avoid excessive API calls on every keystroke
   });
 
+
   // Show suggestions when the input is clicked
   input.addEventListener('focus', () => {
     if (input.value.trim()) {
       showSuggestions(input.value.trim());
     }
   });
+
 
   // Hide the suggestions when the user clicks anywhere else on the page
   document.addEventListener('click', (event) => {
@@ -697,9 +813,11 @@ function setupSearch(inputId, resultsId, buttonId) {
     }
   });
 
+
   // Initial fetch of car data when the page loads
   fetchAllCarsForSearch();
 }
+
 
 // SMOOTH SCROLL FOR FOOTER AND NAV LINKS (MOBILE)
 function setupSmoothScroll() {
@@ -707,12 +825,14 @@ function setupSmoothScroll() {
   const mobileNav = document.getElementById('nav-menu-mobile');
   const hamburger = document.getElementById('nav-hamburger');
 
+
   scrollLinks.forEach(link => {
     link.addEventListener('click', function (e) {
       e.preventDefault(); // Stop the default anchor jump
       const targetId = this.getAttribute('href');
       const targetElement = document.querySelector(targetId);
       if (targetElement) {
+
 
         // Close mobile nav if it's open
         if (mobileNav && mobileNav.classList.contains('active')) {
@@ -723,6 +843,7 @@ function setupSmoothScroll() {
         const headerOffset = window.innerWidth <= 1024 ? 60 : 60; // 1st 60px offset for mobile, 2nd 60px for desktop
         const elementPosition = targetElement.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
 
         // Perform the smooth scroll
         window.scrollTo({
