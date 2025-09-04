@@ -1658,6 +1658,30 @@ gap: var(--space-24);
   border-bottom: none;
 }
 
+/* Center the login modal header */
+#login-modal .modal__header {
+  text-align: center;
+  position: relative;
+}
+
+#login-modal .modal__header h2 {
+  margin: 0 auto;
+}
+
+#login-modal .modal__close {
+  position: absolute;
+  right: var(--space-24);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Fix login modal content structure */
+.login-modal-content p {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-20);
+}
+
 /* Navigation for tablet and smaller desktops */
 .nav {
     display: grid;
