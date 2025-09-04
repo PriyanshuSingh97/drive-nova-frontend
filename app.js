@@ -74,7 +74,90 @@ function renderMobileAuthButton() {
     loginBtn.onclick = openLoginModal; 
     mobileLoginLi.appendChild(loginBtn); 
   } 
-} 
+}
+
+// AUTH TAB SWITCHING
+function showAuthTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.auth-tab[onclick="showAuthTab('${tab}')"]`).classList.add('active');
+    
+    // Update forms
+    document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+    document.getElementById(`${tab}-form`).classList.add('active');
+}
+
+// EMAIL LOGIN
+async function handleEmailLogin(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            localStorage.setItem('jwt_token', data.token);
+            closeLoginModal();
+            renderAuthButtons();
+            renderMobileAuthButton();
+            showPopupMessage('Login successful!');
+        } else {
+            showPopupMessage(data.error || 'Login failed');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showPopupMessage('Login failed. Please try again.');
+    }
+}
+
+// EMAIL REGISTRATION
+async function handleEmailRegister(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('register-username').value;
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    
+    if (password.length < 6) {
+        showPopupMessage('Password must be at least 6 characters long');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            localStorage.setItem('jwt_token', data.token);
+            closeLoginModal();
+            renderAuthButtons();
+            renderMobileAuthButton();
+            showPopupMessage('Registration successful!');
+        } else {
+            showPopupMessage(data.error || 'Registration failed');
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        showPopupMessage('Registration failed. Please try again.');
+    }
+}
 
 // INITIALIZATION
 document.addEventListener('DOMContentLoaded', function () {
@@ -282,6 +365,18 @@ function setupLoginModalEvents() {
   if (modalClose) modalClose.addEventListener('click', closeLoginModal);
   if (modalOverlay) modalOverlay.addEventListener('click', closeLoginModal);
 
+  // Email login form
+  const loginForm = document.getElementById('email-login-form');
+  if (loginForm) {
+      loginForm.addEventListener('submit', handleEmailLogin);
+  }
+  
+  // Email register form
+  const registerForm = document.getElementById('email-register-form');
+  if (registerForm) {
+      registerForm.addEventListener('submit', handleEmailRegister);
+  }
+
   // Handle Google Login
   const googleBtn = document.getElementById('google-login');
   if (googleBtn) {
@@ -406,7 +501,6 @@ async function handleContactSubmit(e) {
     showPopupMessage("Network error! Please try again.", true);
   }
 }
-
 
 // MODAL FUNCTIONS
 function openBookingModal(name, price) {

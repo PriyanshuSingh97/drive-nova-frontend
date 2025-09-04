@@ -243,20 +243,74 @@
       <button id="login-modal-close" class="modal__close">×</button>
     </div>
     <div class="login-modal-content">
-      <p>Please select your preferred login method to continue.</p>
-      <div class="login-options">
-        <button id="google-login" class="login-option">
-        <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" alt="Google logo">
-          Continue with Google
-        </button>
-        <button id="github-login" class="login-option">
-        <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756950613/github-logo_l0mgoo.png" alt="GitHub logo">
-          Continue with GitHub
-        </button>
+      <!-- Tab Navigation -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
+        <button class="auth-tab" onclick="showAuthTab('register')">Register</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-form" class="auth-form active">
+        <form id="email-login-form">
+          <div class="form-group">
+            <input type="email" id="login-email" placeholder="Email" required>
+          </div>
+          <div class="form-group">
+            <input type="password" id="login-password" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full">Login with Email</button>
+        </form>
+        
+        <div class="auth-divider">
+          <span>or continue with</span>
+        </div>
+        
+        <div class="login-options">
+          <button id="google-login" class="login-option">
+            <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" alt="Google logo">
+            Continue with Google
+          </button>
+          <button id="github-login" class="login-option">
+            <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756950613/github-logo_l0mgoo.png" alt="GitHub logo">
+            Continue with GitHub
+          </button>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-form" class="auth-form">
+        <form id="email-register-form">
+          <div class="form-group">
+            <input type="text" id="register-username" placeholder="Username" required>
+          </div>
+          <div class="form-group">
+            <input type="email" id="register-email" placeholder="Email" required>
+          </div>
+          <div class="form-group">
+            <input type="password" id="register-password" placeholder="Password (min 6 characters)" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full">Register with Email</button>
+        </form>
+        
+        <div class="auth-divider">
+          <span>or continue with</span>
+        </div>
+        
+        <div class="login-options">
+          <button id="google-login" class="login-option">
+            <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" alt="Google logo">
+            Continue with Google
+          </button>
+          <button id="github-login" class="login-option">
+            <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756950613/github-logo_l0mgoo.png" alt="GitHub logo">
+            Continue with GitHub
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
 
 
 <!-- Booking Modal -->
