@@ -28,7 +28,7 @@ function logout() {
   localStorage.removeItem('jwt_token');
   renderAuthButtons();
   renderMobileAuthButton();
-  showPopupMessage("Logged out successfully.");
+  showPopupMessage("Logged out successfully.", "success");
 }
 
 // SPINNER HELPER
@@ -120,16 +120,16 @@ async function handleEmailLogin(event) {
             closeLoginModal();
             renderAuthButtons();
             renderMobileAuthButton();
-            showPopupMessage('Login successful!');
+            showPopupMessage('Login successful!', 'success');
             if (currentSelectedCar) {
                 openBookingModal(currentSelectedCar.name, currentSelectedCar.pricePerDay);
             }
         } else {
-            showPopupMessage(data.error || 'Login failed');
+            showPopupMessage(data.error || 'Login failed', 'error');
         }
     } catch (error) {
         console.error('Login error:', error);
-        showPopupMessage('Login failed. Please try again.');
+        showPopupMessage('Login failed. Please try again.', 'error');
     } finally {
         // Restore button state
         loginButton.disabled = false;
@@ -148,7 +148,7 @@ async function handleEmailRegister(event) {
     const password = document.getElementById('register-password').value;
 
     if (password.length < 6) {
-        showPopupMessage('Password must be at least 6 characters long');
+        showPopupMessage('Password must be at least 6 characters long', 'warning');
         return;
     }
 
@@ -168,16 +168,16 @@ async function handleEmailRegister(event) {
             closeLoginModal();
             renderAuthButtons();
             renderMobileAuthButton();
-            showPopupMessage('Registration successful!');
+            showPopupMessage('Registration successful!', 'success');
             if (currentSelectedCar) {
                 openBookingModal(currentSelectedCar.name, currentSelectedCar.pricePerDay);
             }
         } else {
-            showPopupMessage(data.error || 'Registration failed');
+            showPopupMessage(data.error || 'Registration failed', 'error');
         }
     } catch (error) {
         console.error('Registration error:', error);
-        showPopupMessage('Registration failed. Please try again.');
+        showPopupMessage('Registration failed. Please try again.', 'error');
     } finally {
         // Restore button state
         registerButton.disabled = false;
@@ -190,7 +190,7 @@ function handleBookNowClick(car) {
   // Store the selected car globally, so we can access it after login.
   currentSelectedCar = car;
   if (!isUserLoggedIn()) {
-    showPopupMessage("Please login to book a car.");
+    showPopupMessage("Please login to book a car.", "warning");
     openLoginModal(); // If not logged in, show the login modal.
   } else {
     // If already logged in, proceed directly to booking.
@@ -442,16 +442,18 @@ function closeLoginModal() {
   }
 }
 
-// BOOKING FORM SUBMIT
+// BOOKING FORM SUBMIT - FIXED VERSION
 async function handleBookingSubmit(e) {
   e.preventDefault();
   if (!isUserLoggedIn()) {
-    showPopupMessage("Please login to book a car.");
+    showPopupMessage("Please login to book a car.", "warning");
     return;
   }
 
   const form = e.target;
   const formData = new FormData(form);
+  const submitButton = form.querySelector('button[type="submit"]');
+  const originalButtonText = submitButton.innerHTML;
 
   const bookingData = {
     name: formData.get('name'),
@@ -467,8 +469,15 @@ async function handleBookingSubmit(e) {
   };
 
   const formStatus = document.getElementById('form-status');
-  formStatus.textContent = 'Sending booking...';
-  formStatus.style.color = '#ffa500';
+  
+  // Show loading state
+  submitButton.disabled = true;
+  submitButton.innerHTML = `Processing Booking... ${createButtonSpinner()}`;
+  
+  if (formStatus) {
+    formStatus.textContent = 'Sending booking...';
+    formStatus.style.color = '#ffa500';
+  }
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/bookings`, {
@@ -481,26 +490,61 @@ async function handleBookingSubmit(e) {
     });
 
     if (res.ok) {
-      formStatus.textContent = 'Booking Confirmed!';
-      formStatus.style.color = '#28a745';
+      const result = await res.json();
+      
+      if (formStatus) {
+        formStatus.textContent = 'Booking Confirmed!';
+        formStatus.style.color = '#28a745';
+      }
+      
       form.reset();
       closeBookingModal();
-      showPopupMessage("Booking Confirmed! We'll contact you shortly.");
+      
+      // Show success popup message
+      showPopupMessage("Booking Confirmed! We will contact you shortly.", "success");
+      
       renderMobileAuthButton();
       renderAuthButtons();
+      
+      // Clear selected car
+      currentSelectedCar = null;
+      
     } else {
-      if (res.status === 401) { logout(); }
+      if (res.status === 401) { 
+        logout(); 
+        showPopupMessage("Session expired. Please login again.", "warning");
+        return;
+      }
+      
       let errText = 'Booking failed. Please try again.';
       try {
-        errText = (await res.json()).message || errText;
-      } catch (e) { }
-      formStatus.textContent = errText;
-      formStatus.style.color = '#dc3545';
+        const errorData = await res.json();
+        errText = errorData.message || errText;
+      } catch (e) { 
+        console.error('Error parsing response:', e);
+      }
+      
+      if (formStatus) {
+        formStatus.textContent = errText;
+        formStatus.style.color = '#dc3545';
+      }
+      
+      showPopupMessage(errText, "error");
     }
   } catch (err) {
     console.error('Booking error:', err);
-    formStatus.textContent = 'Network error! Please try again.';
-    formStatus.style.color = '#dc3545';
+    const errorMessage = 'Network error! Please try again.';
+    
+    if (formStatus) {
+      formStatus.textContent = errorMessage;
+      formStatus.style.color = '#dc3545';
+    }
+    
+    showPopupMessage(errorMessage, "error");
+  } finally {
+    // Reset button state
+    submitButton.disabled = false;
+    submitButton.innerHTML = originalButtonText;
   }
 }
 
@@ -511,7 +555,7 @@ async function handleContactSubmit(e) {
   const formData = new FormData(form);
   const contactData = Object.fromEntries(formData);
 
-  showPopupMessage("Sending message...", false);
+  showPopupMessage("Sending message...", "info");
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/contact`, {
@@ -522,13 +566,13 @@ async function handleContactSubmit(e) {
 
     if (res.ok) {
       form.reset();
-      showPopupMessage("Message sent successfully!", true);
+      showPopupMessage("Message sent successfully!", "success");
     } else {
-      showPopupMessage("Failed to send message. Please try again.", true);
+      showPopupMessage("Failed to send message. Please try again.", "error");
     }
   } catch (err) {
     console.error('Contact error:', err);
-    showPopupMessage("Network error! Please try again.", true);
+    showPopupMessage("Network error! Please try again.", "error");
   }
 }
 
@@ -577,13 +621,33 @@ function updateBookingTotal() {
   document.getElementById('booking-total').value = total;
 }
 
-// POPUP MESSAGE
-function showPopupMessage(message, isTemporary = true) {
-  const popup = document.getElementById('booking-popup');
-  if (!popup) return;
-  popup.textContent = message;
-  popup.classList.add('visible');
-  if (isTemporary) setTimeout(() => popup.classList.remove('visible'), 3000);
+// POPUP MESSAGE - UPDATED VERSION
+function showPopupMessage(message, type = 'info') {
+    // Remove any existing popup messages
+    const existingPopups = document.querySelectorAll('.popup-message');
+    existingPopups.forEach(popup => popup.remove());
+    
+    const popup = document.createElement('div');
+    popup.className = `popup-message popup-${type}`;
+    popup.textContent = message;
+    
+    document.body.appendChild(popup);
+    
+    // Trigger the visible state
+    setTimeout(() => {
+        popup.classList.add('visible');
+    }, 10);
+    
+    // Remove after 4 seconds for success messages, 3 seconds for others
+    const duration = type === 'success' ? 4000 : 3000;
+    setTimeout(() => {
+        popup.classList.remove('visible');
+        setTimeout(() => {
+            if (popup.parentNode) {
+                popup.parentNode.removeChild(popup);
+            }
+        }, 300);
+    }, duration);
 }
 
 // THEME
