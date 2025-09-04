@@ -1,83 +1,80 @@
-// STORE JWT TOKEN IMMEDIATELY
-(function saveTokenFromUrlImmediately() {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('token');
-  if (token) {
-    localStorage.setItem('jwt_token', token);
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
-})();
+// STORE JWT TOKEN IMMEDIATELY 
+(function saveTokenFromUrlImmediately() { 
+  const params = new URLSearchParams(window.location.search); 
+  const token = params.get('token'); 
+  if (token) { 
+    localStorage.setItem('jwt_token', token); 
+    window.history.replaceState({}, document.title, window.location.pathname); 
+  } 
+})(); 
 
-const API_BASE_URL = "https://drivenova-backend.onrender.com";
-let currentFilter = 'all';
-let isDarkMode = false;
-let currentSelectedCar = null;
+const API_BASE_URL = "https://drivenova-backend.onrender.com"; 
+let currentFilter = 'all'; 
+let isDarkMode = false; 
+let currentSelectedCar = null; 
 
+// AUTH HELPERS 
+function authHeaders() { 
+  const token = localStorage.getItem('jwt_token'); 
+  return token ? { Authorization: `Bearer ${token}` } : {}; 
+} 
 
-//  AUTH HELPERS 
-function authHeaders() {
-  const token = localStorage.getItem('jwt_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+function isUserLoggedIn() { 
+  return !!localStorage.getItem('jwt_token'); 
+} 
 
-function isUserLoggedIn() {
-  return !!localStorage.getItem('jwt_token');
-}
+function logout() { 
+  localStorage.removeItem('jwt_token'); 
+  renderAuthButtons(); 
+  renderMobileAuthButton(); 
+  showPopupMessage("Logged out successfully."); 
+} 
 
-function logout() {
-  localStorage.removeItem('jwt_token');
-  renderAuthButtons();
-  renderMobileAuthButton();
-  showPopupMessage("Logged out successfully.");
-}
+// RENDERING AUTH BUTTONS DESKTOP 
+function renderAuthButtons() { 
+  const desktopLoginLi = document.getElementById('nav-menu-desktop-login'); 
+  if (!desktopLoginLi) return; 
+  desktopLoginLi.innerHTML = ''; 
+  if (isUserLoggedIn()) { 
+    const logoutBtn = document.createElement('button'); 
+    logoutBtn.textContent = 'Logout'; 
+    logoutBtn.className = 'btn btn--primary btn-nav-login'; 
+    logoutBtn.onclick = logout; 
+    desktopLoginLi.appendChild(logoutBtn); 
+  } else { 
+    // Login/Signup button
+    const loginBtn = document.createElement('button'); 
+    loginBtn.textContent = 'Login/Signup'; 
+    loginBtn.className = 'btn btn--primary btn-nav-login'; 
+    loginBtn.onclick = openLoginModal; 
+    desktopLoginLi.appendChild(loginBtn); 
+  } 
+} 
 
-
-// RENDERING AUTH BUTTONS DESKTOP
-function renderAuthButtons() {
-  const desktopLoginLi = document.getElementById('nav-menu-desktop-login');
-  if (!desktopLoginLi) return;
-  desktopLoginLi.innerHTML = '';
-  if (isUserLoggedIn()) {
-    const logoutBtn = document.createElement('button');
-    logoutBtn.textContent = 'Logout';
-    logoutBtn.className = 'btn btn--primary btn-nav-login';
-    logoutBtn.onclick = logout;
-    desktopLoginLi.appendChild(logoutBtn);
-  } else {
-    const a = document.createElement('a');
-    a.href = API_BASE_URL + "/api/auth/google";
-    a.className = "btn btn--primary btn-nav-login";
-    a.innerHTML = `<img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" 
-      style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
-    desktopLoginLi.appendChild(a);
-  }
-}
-
-// RENDERING AUTH BUTTONS MOBILE
-function renderMobileAuthButton() {
-  const mobileLoginLi = document.getElementById('nav-menu-mobile-login');
-  if (!mobileLoginLi) return;
-  mobileLoginLi.innerHTML = '';
-  if (isUserLoggedIn()) {
-    const logoutBtn = document.createElement('button');
-    logoutBtn.textContent = 'Logout';
-    logoutBtn.className = 'btn btn--primary btn-nav-login mobile-login';
-    logoutBtn.onclick = function () {
-      logout();
-      document.getElementById('nav-menu-mobile').classList.remove('active');
-      document.getElementById('nav-hamburger').classList.remove('active');
-    };
-    mobileLoginLi.appendChild(logoutBtn);
-  } else {
-    const loginBtn = document.createElement('a');
-    loginBtn.href = API_BASE_URL + "/api/auth/google";
-    loginBtn.className = 'btn btn--primary btn-nav-login mobile-login';
-    loginBtn.innerHTML = `<img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" 
-      style="height:18px;margin-right:8px;vertical-align:-3px">Google Login`;
-    mobileLoginLi.appendChild(loginBtn);
-  }
-}
-
+// RENDERING AUTH BUTTONS MOBILE 
+function renderMobileAuthButton() { 
+  const mobileLoginLi = document.getElementById('nav-menu-mobile-login'); 
+  if (!mobileLoginLi) return; 
+  mobileLoginLi.innerHTML = ''; 
+  if (isUserLoggedIn()) { 
+    const logoutBtn = document.createElement('button'); 
+    logoutBtn.textContent = 'Logout'; 
+    logoutBtn.className = 'btn btn--primary btn-nav-login mobile-login'; 
+    logoutBtn.onclick = function () { 
+      logout(); 
+      document.getElementById('nav-menu-mobile').classList.remove('active'); 
+      document.getElementById('nav-hamburger').classList.remove('active'); 
+    }; 
+    mobileLoginLi.appendChild(logoutBtn); 
+  } else { 
+    // Login/Signup button for mobile
+    const loginBtn = document.createElement('button'); 
+    loginBtn.textContent = 'Login/Signup'; 
+    loginBtn.className = 'btn btn--primary btn-nav-login mobile-login'; 
+    loginBtn.onclick = openLoginModal; 
+    mobileLoginLi.appendChild(loginBtn); 
+  } 
+} 
 
 // INITIALIZATION
 document.addEventListener('DOMContentLoaded', function () {
@@ -94,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
   setupMobileNavScroll();
   setupSmoothScroll();
 });
-
 
 // FETCH & RENDER CARS
 async function fetchAndRenderCars(filter = 'all') {
@@ -191,8 +187,6 @@ function createCarCard(car) {
   return card;
 }
 
-
-
 // EVENT LISTENERS
 function setupEventListeners() {
 
@@ -230,7 +224,10 @@ function setupEventListeners() {
   document.getElementById('contact-form')?.addEventListener('submit', handleContactSubmit); // Contact form submission
 
   document.addEventListener('keydown', (e) => { // Escape key closes modal
-    if (e.key === 'Escape') closeBookingModal();
+    if (e.key === 'Escape') {
+      closeBookingModal();
+      closeLoginModal();
+    }
   });
 
   // Theme toggles
@@ -255,7 +252,6 @@ function setupEventListeners() {
   }
 }
 
-
 // MOBILE NAV SCROLL
 function setupMobileNavScroll() {
   function isMobile() {
@@ -279,7 +275,6 @@ function setupMobileNavScroll() {
   });
 }
 
-
 // LOGIN MODAL EVENTS
 function setupLoginModalEvents() {
   const modalClose = document.getElementById('login-modal-close');
@@ -294,8 +289,32 @@ function setupLoginModalEvents() {
       window.location.href = API_BASE_URL + "/api/auth/google";
     });
   }
+
+  // Handle GitHub Login
+  const githubBtn = document.getElementById('github-login');
+  if (githubBtn) {
+    githubBtn.addEventListener('click', function () {
+      window.location.href = API_BASE_URL + "/api/auth/github";
+    });
+  }
 }
 
+// LOGIN MODAL FUNCTIONS
+function openLoginModal() {
+  const loginModal = document.getElementById('login-modal');
+  if (loginModal) {
+    loginModal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeLoginModal() {
+  const loginModal = document.getElementById('login-modal');
+  if (loginModal) {
+    loginModal.classList.remove('visible');
+    document.body.style.overflow = 'auto';
+  }
+}
 
 // BOOKING FORM SUBMIT
 async function handleBookingSubmit(e) {
@@ -359,7 +378,6 @@ async function handleBookingSubmit(e) {
   }
 }
 
-
 // CONTACT FORM SUBMIT
 async function handleContactSubmit(e) {
   e.preventDefault();
@@ -394,7 +412,6 @@ async function handleContactSubmit(e) {
     contactStatus.style.color = '#dc3545';
   }
 }
-
 
 // MODAL FUNCTIONS
 function openBookingModal(name, price) {
@@ -448,7 +465,6 @@ function showPopupMessage(message, isTemporary = true) {
   if (isTemporary) setTimeout(() => popup.classList.remove('visible'), 3000);
 }
 
-
 // THEME
 const themeSwitch = document.getElementById('theme-switch');
 const mobileThemeSwitch = document.getElementById('mobile-theme-switch');
@@ -473,7 +489,6 @@ function updateTheme() {
   document.documentElement.setAttribute('data-color-scheme', isDarkMode ? 'dark' : 'light');
 }
 
-
 // SCROLL EFFECTS
 function setupScrollEffects() {
   const header = document.getElementById('header');
@@ -492,7 +507,6 @@ function setupScrollAnimations() {
   animateElements.forEach(el => observer.observe(el));
 }
 
-
 // DATE DEFAULTS
 function setDefaultDates() {
   const today = new Date();
@@ -509,7 +523,6 @@ function setDefaultDates() {
     dropoff.min = format(tomorrow);
   }
 }
-
 
 // SEARCH BAR
 function setupSearch(inputId, resultsId, buttonId) {
@@ -599,7 +612,6 @@ function setupSearch(inputId, resultsId, buttonId) {
   fetchAllCarsForSearch();
 }
 
-
 // SMOOTH SCROLL FOR FOOTER AND NAV LINKS (MOBILE)
 function setupSmoothScroll() {
   const scrollLinks = document.querySelectorAll('a[href^="#"]');
@@ -631,14 +643,4 @@ function setupSmoothScroll() {
       }
     });
   });
-}
-
-
-// LOGIN MODAL SUPPORT
-function openLoginModal() {
-  document.getElementById('login-modal').classList.add('visible');
-}
-
-function closeLoginModal() {
-  document.getElementById('login-modal').classList.remove('visible');
 }
