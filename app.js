@@ -385,11 +385,8 @@ async function handleContactSubmit(e) {
   const formData = new FormData(form);
   const contactData = Object.fromEntries(formData);
 
-  const contactStatus = document.getElementById('contact-status') || document.createElement('p');
-  contactStatus.id = 'contact-status';
-  form.appendChild(contactStatus);
-  contactStatus.textContent = 'Sending message...';
-  contactStatus.style.color = '#ffa500';
+  // Show loading message
+  showPopupMessage("Sending message...", false);
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/contact`, {
@@ -399,19 +396,17 @@ async function handleContactSubmit(e) {
     });
 
     if (res.ok) {
-      contactStatus.textContent = 'Message sent successfully!';
-      contactStatus.style.color = '#28a745';
       form.reset();
+      showPopupMessage("Message sent successfully!", true);
     } else {
-      contactStatus.textContent = 'Failed to send message. Try again.';
-      contactStatus.style.color = '#dc3545';
+      showPopupMessage("Failed to send message. Please try again.", true);
     }
   } catch (err) {
     console.error('Contact error:', err);
-    contactStatus.textContent = 'Network error! Please try again.';
-    contactStatus.style.color = '#dc3545';
+    showPopupMessage("Network error! Please try again.", true);
   }
 }
+
 
 // MODAL FUNCTIONS
 function openBookingModal(name, price) {
