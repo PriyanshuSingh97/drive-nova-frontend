@@ -1,5 +1,3 @@
-// app.js
-
 // STORE JWT TOKEN IMMEDIATELY
 (function saveTokenFromUrlImmediately() {
   const params = new URLSearchParams(window.location.search);
@@ -187,7 +185,7 @@ async function handleEmailRegister(event) {
     }
 }
 
-// --- FIX: New function to handle the booking click, which centralizes the logic ---
+// Function to handle the booking click
 function handleBookNowClick(car) {
   // Store the selected car globally, so we can access it after login.
   currentSelectedCar = car;
@@ -199,7 +197,6 @@ function handleBookNowClick(car) {
     openBookingModal(car.name, car.pricePerDay);
   }
 }
-// --- END FIX ---
 
 // INITIALIZATION
 document.addEventListener('DOMContentLoaded', function () {
@@ -216,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setupMobileNavScroll();
   setupSmoothScroll();
   
-  // --- FIX: Check for a pending booking after OAuth redirect ---
+  // Check for a pending booking after OAuth redirect
   const pendingCarJSON = sessionStorage.getItem('pending_booking_car');
   if (pendingCarJSON && isUserLoggedIn()) {
     try {
@@ -230,7 +227,6 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionStorage.removeItem('pending_booking_car'); // Clean up
     }
   }
-  // --- END FIX ---
 });
 
 // FETCH & RENDER CARS
