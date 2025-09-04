@@ -1527,6 +1527,12 @@ border-bottom: 1px solid var(--color-border);
   background: linear-gradient(135deg, var(--color-error), var(--color-red-600));
 }
 
+.popup-message.popup-success {
+    background: linear-gradient(135deg, var(--color-success), var(--color-teal-600));
+    color: var(--color-vibrant-blue);
+}
+
+
 /* Login Modal Specific Styles */
 .login-modal-content {
   text-align: center;

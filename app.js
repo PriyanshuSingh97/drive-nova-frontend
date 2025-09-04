@@ -658,9 +658,9 @@ function showPopupMessage(message, type = 'info') {
     setTimeout(() => {
         popup.classList.add('visible');
     }, 10);
-    
-    // Remove after 3 seconds for success messages, 3 seconds for others
-    const duration = type === 'success' ? 3000 : 3000;
+
+    // Remove after 3.5 seconds for success messages, 3 seconds for others
+    const duration = type === 'success' ? 3500 : 3000;
     setTimeout(() => {
         popup.classList.remove('visible');
         setTimeout(() => {
