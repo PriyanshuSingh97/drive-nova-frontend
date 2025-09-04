@@ -442,7 +442,7 @@ function closeLoginModal() {
   }
 }
 
-// BOOKING FORM SUBMIT - FIXED VERSION
+// BOOKING FORM SUBMIT
 async function handleBookingSubmit(e) {
   e.preventDefault();
   if (!isUserLoggedIn()) {
@@ -621,7 +621,7 @@ function updateBookingTotal() {
   document.getElementById('booking-total').value = total;
 }
 
-// POPUP MESSAGE - UPDATED VERSION
+// POPUP MESSAGE
 function showPopupMessage(message, type = 'info') {
     // Remove any existing popup messages
     const existingPopups = document.querySelectorAll('.popup-message');
@@ -638,8 +638,8 @@ function showPopupMessage(message, type = 'info') {
         popup.classList.add('visible');
     }, 10);
     
-    // Remove after 4 seconds for success messages, 3 seconds for others
-    const duration = type === 'success' ? 4000 : 3000;
+    // Remove after 5 seconds for success messages, 3 seconds for others
+    const duration = type === 'success' ? 5000 : 3000;
     setTimeout(() => {
         popup.classList.remove('visible');
         setTimeout(() => {
