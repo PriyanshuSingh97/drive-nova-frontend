@@ -492,9 +492,10 @@ async function handleBookingSubmit(e) {
     if (res.ok) {
       const result = await res.json();
       
+      // Clear form status immediately after success
       if (formStatus) {
-        formStatus.textContent = 'Booking Confirmed!';
-        formStatus.style.color = '#28a745';
+        formStatus.textContent = '';
+        formStatus.style.color = '';
       }
       
       form.reset();
@@ -585,6 +586,14 @@ function openBookingModal(name, price) {
   document.getElementById('book-car').value = carToBook.name;
   setDefaultDates();
   updateBookingTotal();
+  
+  // Clear any previous form status messages
+  const formStatus = document.getElementById('form-status');
+  if (formStatus) {
+    formStatus.textContent = '';
+    formStatus.style.color = '';
+  }
+  
   modal.classList.remove('hidden');
   modal.classList.add('visible');
   document.body.style.overflow = 'hidden';
@@ -594,7 +603,19 @@ function closeBookingModal() {
   const modal = document.getElementById('booking-modal');
   modal.classList.remove('visible');
   modal.classList.add('hidden');
-  document.getElementById('booking-form')?.reset();
+  
+  // Clear form and status messages
+  const form = document.getElementById('booking-form');
+  if (form) {
+    form.reset();
+  }
+  
+  const formStatus = document.getElementById('form-status');
+  if (formStatus) {
+    formStatus.textContent = '';
+    formStatus.style.color = '';
+  }
+  
   document.body.style.overflow = 'auto';
   currentSelectedCar = null;
 }
@@ -754,7 +775,7 @@ function setupSearch(inputId, resultsId, buttonId) {
           if (carCard) {
             carCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
             carCard.classList.add('highlight');
-            setTimeout(() => carCard.classList.remove('highlight'), 2000);
+            setTimeout(() => carCard.classList.remove('highlight'), 3000);
           }
         });
         resultsContainer.appendChild(item);
