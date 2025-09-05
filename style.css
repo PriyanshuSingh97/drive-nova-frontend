@@ -486,13 +486,9 @@ border: 1px solid
 rgba(var(--color-error-rgb, 239, 68, 68), var(--status-border-opacity));
 }
 .status--warning {
-background-color: rgba(
-var(--color-warning-rgb, 249, 115, 22),
-var(--status-bg-opacity)
-);
-color: var(--color-warning);
-border: 1px solid
-rgba(var(--color-warning-rgb, 249, 115, 22), var(--status-border-opacity));
+  background-color: rgba(var(--color-info-rgb, 59, 130, 246), var(--status-bg-opacity));
+  color: var(--color-info, #3b82f6);
+  border: 1px solid rgba(var(--color-info-rgb, 59, 130, 246), var(--status-border-opacity));
 }
 .status--info {
 background-color: rgba(

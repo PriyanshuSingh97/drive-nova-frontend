@@ -396,34 +396,61 @@ function setupLoginModalEvents() {
 
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
-      loginForm.addEventListener('submit', handleEmailLogin);
+    loginForm.addEventListener('submit', handleEmailLogin);
   }
   
   const registerForm = document.getElementById('register-form');
   if (registerForm) {
-      registerForm.addEventListener('submit', handleEmailRegister);
+    registerForm.addEventListener('submit', handleEmailRegister);
   }
 
-  const googleBtn = document.getElementById('google-login');
-  if (googleBtn) {
-    googleBtn.addEventListener('click', function () {
+// Google login buttons (login + register)
+['google-login-login', 'google-login-register'].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) {
+    btn.addEventListener('click', function () {
+      // Save original text so we can restore if needed
+      const originalText = btn.innerHTML;
+
+      // Show loading state with spinner
+      btn.disabled = true;
+      btn.innerHTML = `Connecting to Google... ${createButtonSpinner()}`;
+
       if (currentSelectedCar) {
         sessionStorage.setItem('pending_booking_car', JSON.stringify(currentSelectedCar));
       }
-      window.location.href = API_BASE_URL + "/api/auth/google";
+
+      // Small delay for smoother UX before redirect
+      setTimeout(() => {
+        window.location.href = API_BASE_URL + "/api/auth/google";
+      }, 300);
     });
   }
+});
 
-  const githubBtn = document.getElementById('github-login');
-  if (githubBtn) {
-    githubBtn.addEventListener('click', function () {
+// GitHub login buttons (login + register)
+['github-login-login', 'github-login-register'].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) {
+    btn.addEventListener('click', function () {
+      const originalText = btn.innerHTML;
+
+      btn.disabled = true;
+      btn.innerHTML = `Connecting to GitHub... ${createButtonSpinner()}`;
+
       if (currentSelectedCar) {
         sessionStorage.setItem('pending_booking_car', JSON.stringify(currentSelectedCar));
       }
-      window.location.href = API_BASE_URL + "/api/auth/github";
+
+      setTimeout(() => {
+        window.location.href = API_BASE_URL + "/api/auth/github";
+      }, 300);
     });
   }
+});
+
 }
+
 
 // LOGIN MODAL FUNCTIONS
 function openLoginModal() {
