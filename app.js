@@ -451,7 +451,6 @@ function setupLoginModalEvents() {
 
 }
 
-
 // LOGIN MODAL FUNCTIONS
 function openLoginModal() {
   const loginModal = document.getElementById('login-modal');

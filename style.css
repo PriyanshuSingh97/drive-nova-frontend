@@ -15,7 +15,7 @@
 --color-vibrant-blue: rgba(37, 99, 235, 1);
 --color-vibrant-blue-darker: rgba(29, 78, 216, 1);
 
-/* New Modern Color Palette */
+/* Modern Color Palette */
 --color-primary-50: rgba(240, 249, 255, 1);
 --color-primary-100: rgba(224, 242, 254, 1);
 --color-primary-200: rgba(186, 230, 253, 1);
@@ -234,7 +234,7 @@ background-color: var(--color-background);
 -webkit-font-smoothing: antialiased;
 box-sizing: border-box;
 
-/* Added scroll-padding-top for fixed header */
+/* Scroll-padding-top for fixed header */
 scroll-padding-top: 60px; /* Default for desktop */
 }
 body {
@@ -620,6 +620,8 @@ outline-offset: 2px;
 [data-color-scheme="dark"] .btn--outline {
 border: 1px solid var(--color-border-secondary);
 }
+
+/* Font Face */
 @font-face {
   font-family: 'FKGroteskNeue';
   src: url('./fonts/FKGroteskNeue.woff2') format('woff2');
@@ -735,7 +737,7 @@ gap: var(--space-20);
 
 /* Checked state (Dark Mode) */
 .theme-toggle__switch:checked + .theme-toggle__label {
-    transform: translateX(26px); /* Move thumb to the right */
+    transform: translateX(26px); /* Move switch to the right */
     background-color: var(--color-white); /* Always white in dark mode */
 }
 .theme-toggle__switch:checked ~ .theme-toggle {
@@ -1018,7 +1020,7 @@ padding: var(--space-24);
   display: flex;
   justify-content: space-between;
   align-items: center; /* Ensures brand tag is vertically centered */
-  margin-bottom: var(--space-4); /* Reduced space below the header */
+  margin-bottom: var(--space-4); /* Reduce space below the header */
 }
 .car-card__name {
 font-size: var(--font-size-xl);
@@ -1537,7 +1539,6 @@ border-bottom: 1px solid var(--color-border);
     font-weight: var(--font-weight-medium);
 }
 
-
 /* Login Modal Specific Styles */
 .login-modal-content {
   text-align: center;
@@ -1725,7 +1726,7 @@ gap: var(--space-24);
     display: flex !important; /* Ensure mobile elements are visible */
 }
 
-/* The nav__menu links still be hidden by default and toggled by hamburger */
+/* Mobile nav menu (hidden by default, shown when hamburger is toggled) */
 .nav__menu.mobile-only { 
     position: fixed;
     top: 48px;
@@ -1830,7 +1831,7 @@ padding: var(--space-24) 0;
 }
 .fleet__filters {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Creates a responsive grid */
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Creates responsive grid */
   gap: var(--space-12);
   padding: 0 var(--space-16);
 }
@@ -1963,12 +1964,12 @@ justify-content: space-between;
 
 /* Center desktop navigation links */
 .nav__menu.desktop-only {
-    order: 2; /* Places it between logo and controls */
-    flex-grow: 1; /* Allows it to take available space */
+    order: 2; /* Place it between logo and controls */
+    flex-grow: 1; /* Allow it to take available space */
     justify-content: center; 
 }
 .nav__controls {
-    order: 3; /* Places it to the right */
+    order: 3; /* Place it to the right */
     flex-direction: row;
     margin-top: 0;
     margin-left: auto; /* Push to the right */
@@ -2145,7 +2146,6 @@ border: 2px solid var(--color-border);
         align-items: center; /* Center list items */
     }
 }
-
 
 /* Google Button Styles */
 .google-btn {
@@ -2327,7 +2327,6 @@ border: 2px solid var(--color-border);
   margin-bottom: var(--space-12);
 }
 
-
 /* Car Specs Section */
 .car-card__specs {
   display: flex;
@@ -2458,7 +2457,6 @@ border: 2px solid var(--color-border);
 .btn--full {
     width: 100%;
 }
-
 
 /* Spinner inside a button */
 .btn .spinner {
