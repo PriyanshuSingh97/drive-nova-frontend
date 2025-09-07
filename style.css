@@ -37,8 +37,8 @@
 --color-teal-800: rgba(17, 94, 89, 1);
 --color-red-400: rgba(248, 113, 113, 1);
 --color-red-500: rgba(239, 68, 68, 1);
---color-orange-400: rgba(251, 146, 60, 1);
---color-orange-500: rgba(249, 115, 22, 1);
+--color-blue-400: rgb(60, 165, 251);
+--color-blue-500: rgb(0, 4, 255);
 
 /* RGB versions for opacity control */
 --color-brown-600-rgb: 94, 82, 64;
@@ -50,8 +50,8 @@
 --color-slate-500-rgb: 98, 108, 113;
 --color-red-500-rgb: 239, 68, 68;
 --color-red-400-rgb: 248, 113, 113;
---color-orange-500-rgb: 249, 115, 22;
---color-orange-400-rgb: 251, 146, 60;
+--color-blue-500-rgb: 60, 165, 251;
+--color-blue-400-rgb: 0, 4, 255;
 
 /* Background color tokens (Light Mode) */
 --color-bg-1: rgba(59, 130, 246, 0.08);
@@ -1516,8 +1516,8 @@ border-bottom: 1px solid var(--color-border);
 .popup-message.popup-warning {
 	background: linear-gradient(
 		135deg,
-		var(--color-orange-400),
-		var(--color-orange-500)
+		var(--color-blue-400),
+		var(--color-blue-500)
 	);
 }
 
