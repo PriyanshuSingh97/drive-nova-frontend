@@ -1,26 +1,26 @@
 # 🚗 DriveNova — Frontend
 
-🌐 **Live Frontend:** [https://drivenova.onrender.com](https://drivenova.onrender.com)
+This is the frontend of the DriveNova project — a premium car rental platform featuring animated UI, dark mode toggle, category filtering, search, and integrated authentication via Google/GitHub OAuth with JWT handoff from the backend.  
+The client consumes REST APIs for cars, bookings, and contact, and manages session state via localStorage.
 
-This repository contains the **frontend** of the DriveNova project. It provides the user-facing interface for browsing, booking, and interacting with the platform.
+## 🌐 Live Site
+👉 [DriveNova Frontend](https://drivenova.onrender.com)
 
 ---
 
 ## ⚡ Features
-- Modern and responsive UI
-- Car browsing and search
-- Booking form with date selection
-- User authentication (JWT + OAuth)
-- Contact form integration
-- Smooth animations and transitions
+- Clean and interactive user interface with animations
+- Search and browse from a wide catalog of cars
+- Authentication with JWT (Google/GitHub OAuth redirects back with token, stored in localStorage)
+- Booking and contact flows wired to backend endpoints with proper validation and toasts
+- Dark mode support for better accessibility
 
 ---
 
 ## 🛠️ Tech Stack
 - **HTML5, CSS3, JavaScript (Vanilla)**
-- **Fetch API** for backend communication
+- **REST API integration** with configurable API base URL
 - **LocalStorage** for session management
-- **Animate.css** for UI animations
 
 ---
 
