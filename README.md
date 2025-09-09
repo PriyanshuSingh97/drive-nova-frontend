@@ -13,7 +13,7 @@
 - Booking and contact flows wired to backend endpoints, with success/error toasts and graceful fallbacks.
 - Dark mode support for better accessibility.
 
-##Tech Stack
+## Tech Stack
 - HTML5, CSS3 (design tokens, responsive, dark mode), JS.
 - REST API integration with a configurable API base URL via constant.
 
