@@ -3,6 +3,8 @@
 - This is the frontend of the DriveNova project — a premium car rental platform featuring animated UI, dark mode toggle, category filtering, search, and integrated authentication via Google/GitHub OAuth with JWT handoff from the backend.  
 - The client consumes REST APIs for cars, bookings, and contact, and manages session state via localStorage.
 
+---
+
 ## 🌐 Live Site
 👉 [DriveNova Frontend](https://drivenova.onrender.com)
 
