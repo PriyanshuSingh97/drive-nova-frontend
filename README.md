@@ -25,13 +25,14 @@ This repository contains the **frontend** of the DriveNova project. It provides 
 ---
 
 ## 📂 Project Structure
+```plaintext
 frontend/
-│── index.html # Main entry point
-│── style.css # Stylesheet
-│── app.js # Frontend logic and API calls
+├── index.html          # Main entry point
+├── style.css           # Stylesheet
+├── app.js              # Frontend logic and API calls
 │
-├── fonts/ # Custom fonts
-└── README.md # Project documentation
+├── fonts/              # Custom fonts
+└── README.md           # Project documentation
 
 ---
 
