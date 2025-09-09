@@ -1,31 +1,46 @@
-# DriveNova Frontend
+# 🚗 DriveNova — Frontend
 
-- This is the frontend of the *DriveNova* project — a premium car rental platform featuring animated UI, dark mode toggle, category filtering, search, and integrated authentication via Google/GitHub OAuth with JWT handoff from the backend. The client consumes REST APIs for cars, bookings, and contact, and manages session state via localStorage.
-- It is designed to deliver speed, security, and interactivity while connecting with the backend services for authentication, car listings, and bookings.
+🌐 **Live Frontend:** [https://drivenova.onrender.com](https://drivenova.onrender.com)
 
-## Live Site
-👉 [DriveNova Frontend](https://drivenova.onrender.com)
+This repository contains the **frontend** of the DriveNova project. It provides the user-facing interface for browsing, booking, and interacting with the platform.
 
-## Features
-- Clean and interactive user interface with animations
-- Search and browse from a wide catalog of cars
-- Auth with JWT: Google/GitHub login redirects back with token, stored in localStorage for API calls.
-- Booking and contact flows wired to backend endpoints, with success/error toasts and graceful fallbacks.
-- Dark mode support for better accessibility.
+---
 
-## Tech Stack
-- HTML5, CSS3 (design tokens, responsive, dark mode), JS.
-- REST API integration with a configurable API base URL via constant.
+## ⚡ Features
+- Modern and responsive UI
+- Car browsing and search
+- Booking form with date selection
+- User authentication (JWT + OAuth)
+- Contact form integration
+- Smooth animations and transitions
 
-## Project Structure
-- index.html — main page with sections (hero, search, fleet, features, contact).
-- style.css — tokenized theme, dark mode, components, animations, responsive rules.
-- app.js — API integration, auth handling, UI rendering, filters, and booking logic.
+---
 
-## Important Note
-- This repository is part of a full-stack project. The backend code is hosted in a separate repository.  
-- The project is made available here for demonstration purposes only. Unauthorized copying or redistribution of this work is not permitted.
+## 🛠️ Tech Stack
+- **HTML5, CSS3, JavaScript (Vanilla)**
+- **Fetch API** for backend communication
+- **LocalStorage** for session management
+- **Animate.css** for UI animations
 
-## Related Repository
-- [DriveNova Backend](https://drivenova-backend.onrender.com)
+---
 
+## 📂 Project Structure
+frontend/
+│── index.html # Main entry point
+│── style.css # Stylesheet
+│── app.js # Frontend logic and API calls
+│
+├── fonts/ # Custom fonts
+└── README.md # Project documentation
+
+---
+
+## 🔗 Backend API
+The frontend connects to the backend hosted at:  
+👉 [https://drivenova-backend.onrender.com](https://drivenova-backend.onrender.com)
+
+---
+
+## ⚠️ Important Notice
+This project is **owned by me** and is uploaded to GitHub **only for portfolio and deployment purposes**.  
+🚫 **Do not copy, redistribute, or claim this project as your own.**
