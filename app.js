@@ -863,3 +863,32 @@ function setupSmoothScroll() {
     });
   });
 }
+
+// Restores the OAuth login buttons to their original, clickable state
+function resetOAuthButtons() {
+	// Find all OAuth buttons that might have been disabled
+	const oauthButtons = document.querySelectorAll('.login-option[onclick*="handleAuthRedirect"]');
+
+	oauthButtons.forEach(button => {
+		// Only act on buttons that are currently in a disabled state
+		if (button.classList.contains('disabled')) {
+			button.classList.remove('disabled');
+
+			// Restore the original content based on the OAuth provider
+			if (button.getAttribute('onclick').includes('google')) {
+				button.innerHTML = `
+                    <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756950611/google-logo_qf8vsc.png" alt="Google">
+                    <span>Continue with Google</span>
+                `;
+			} else if (button.getAttribute('onclick').includes('github')) {
+				button.innerHTML = `
+                    <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756950613/github-logo_l0mgoo.png" alt="GitHub">
+                    <span>Continue with GitHub</span>
+                `;
+			}
+		}
+	});
+}
+
+// Reset OAuth buttons when the window regains focus
+window.addEventListener('focus', resetOAuthButtons);
