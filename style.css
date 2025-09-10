@@ -1551,52 +1551,73 @@ border-bottom: 1px solid var(--color-border);
 
 /* Login Modal Specific Styles */
 .login-modal-content {
-  text-align: center;
-  padding: var(--space-24);
+	text-align: center;
+	padding: var(--space-24);
 }
 
 .login-options {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-16);
-  margin-top: var(--space-24);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-16);
+	margin-top: var(--space-24);
 }
 
 .login-option {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-8);
-  padding: var(--space-12);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-base);
-  background: var(--color-surface);
-  cursor: pointer;
-  font-weight: var(--font-weight-medium);
-  transition: all var(--duration-fast) var(--ease-standard);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-8);
+	padding: var(--space-12);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-base);
+	background: var(--color-surface);
+	color: var(--color-text);
+	cursor: pointer;
+	font-weight: var(--font-weight-medium);
+	transition: all var(--duration-fast) var(--ease-standard);
 }
 
 .login-option:hover:not(.disabled) {
-  background: var(--color-secondary);
-  transform: translateY(-1px);
+	background: var(--color-secondary);
+	transform: translateY(-1px);
 }
 
 .login-option.disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
+	cursor: not-allowed;
+	opacity: 0.6;
 }
 
 .login-option img {
-  width: 20px;
-  height: 20px;
+	width: 20px;
+	height: 20px;
+	transition: filter var(--duration-fast) var(--ease-standard);
 }
 
 .coming-soon {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-left: var(--space-4);
-  font-style: italic;
+	font-size: var(--font-size-xs);
+	color: var(--color-text-secondary);
+	margin-left: var(--space-4);
+	font-style: italic;
 }
+
+/* Style the buttons for dark mode within any modal */
+[data-color-scheme="dark"] .modal__content .login-option {
+	background: var(--color-charcoal-800);
+	border-color: rgba(var(--color-gray-400-rgb), 0.3);
+	color: var(--color-gray-200); /* Ensures text is light */
+}
+
+/* Style the button hover state for dark mode */
+[data-color-scheme="dark"] .modal__content .login-option:hover:not(.disabled) {
+	background: rgba(var(--color-gray-200-rgb), 0.1);
+	border-color: rgba(var(--color-gray-300-rgb), 0.5);
+}
+
+/* GitHub logo color to white only when in dark mode. */
+[data-color-scheme="dark"] img[src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756950613/github-logo_l0mgoo.png"] {
+	filter: invert(1);
+}
+
 
 /* Login Button Styles */
 .btn-nav-login {
