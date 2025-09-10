@@ -121,7 +121,8 @@ function showAuthTab(tab) {
 // EMAIL LOGIN
 async function handleEmailLogin(event) {
     event.preventDefault();
-    const loginButton = event.target.querySelector('button[type="submit"]');
+    const loginForm = event.target;
+    const loginButton = loginForm.querySelector('button[type="submit"]');
     const originalButtonText = loginButton.innerHTML;
 
     // Show loading state
@@ -163,7 +164,8 @@ async function handleEmailLogin(event) {
 // EMAIL REGISTRATION
 async function handleEmailRegister(event) {
     event.preventDefault();
-    const registerButton = event.target.querySelector('button[type="submit"]');
+    const registerForm = event.target;
+    const registerButton = registerForm.querySelector('button[type="submit"]');
     const originalButtonText = registerButton.innerHTML;
 
     const username = document.getElementById('register-username').value;
@@ -250,6 +252,22 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionStorage.removeItem('pending_booking_car');
     }
   }
+
+  // Listen for tab focus/visibility changes to reset OAuth button states
+  const resetButtonsOnFocus = () => {
+    const loginModal = document.getElementById('login-modal');
+    // Only reset if the login modal is currently visible
+    if (loginModal && loginModal.classList.contains('visible')) {
+        resetOAuthButtons();
+    }
+  };
+
+  window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+          resetButtonsOnFocus();
+      }
+  });
+  window.addEventListener('focus', resetButtonsOnFocus);
 });
 
 // FETCH & RENDER CARS
@@ -433,9 +451,6 @@ function setupLoginModalEvents() {
   const btn = document.getElementById(id);
   if (btn) {
     btn.addEventListener('click', function () {
-      // Save original text so we can restore if needed
-      const originalText = btn.innerHTML;
-
       // Show loading state with spinner
       btn.disabled = true;
       btn.innerHTML = `Connecting to Google... ${createButtonSpinner()}`;
@@ -457,8 +472,6 @@ function setupLoginModalEvents() {
   const btn = document.getElementById(id);
   if (btn) {
     btn.addEventListener('click', function () {
-      const originalText = btn.innerHTML;
-
       btn.disabled = true;
       btn.innerHTML = `Connecting to GitHub... ${createButtonSpinner()}`;
 
@@ -475,10 +488,38 @@ function setupLoginModalEvents() {
 
 }
 
+// Function to reset OAuth buttons to their default state
+function resetOAuthButtons() {
+    ['google-login-login', 'google-login-register'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.disabled = false;
+            // Reconstruct the original button content
+            btn.innerHTML = `
+                <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" alt="Google logo">
+                Continue with Google
+            `;
+        }
+    });
+
+    ['github-login-login', 'github-login-register'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.disabled = false;
+            // Reconstruct the original button content
+            btn.innerHTML = `
+                <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756950613/github-logo_l0mgoo.png" alt="GitHub logo">
+                Continue with GitHub
+            `;
+        }
+    });
+}
+
 // LOGIN MODAL FUNCTIONS
 function openLoginModal() {
   const loginModal = document.getElementById('login-modal');
   if (loginModal) {
+    resetOAuthButtons(); // Reset buttons every time modal is opened
     loginModal.classList.remove('hidden');
     loginModal.classList.add('visible');
     document.body.style.overflow = 'hidden';
@@ -1020,3 +1061,4 @@ function closeMobileNav() {
     if (mobileNav) mobileNav.classList.remove('active');
     if (hamburger) hamburger.classList.remove('active');
 }
+
