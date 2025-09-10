@@ -863,29 +863,3 @@ function setupSmoothScroll() {
     });
   });
 }
-
-// Reset OAuth buttons when window regains focus
-function resetOAuthButtons() {
-  const oauthButtons = document.querySelectorAll('.login-option.disabled');
-
-  oauthButtons.forEach(button => {
-    button.disabled = false; // re-enable button
-    button.classList.remove('disabled');
-
-    const provider = button.getAttribute('data-provider');
-    if (provider === 'google') {
-      button.innerHTML = `
-        <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756804446/g-logo_vap9w9.png" alt="Google logo">
-        Continue with Google
-      `;
-    } else if (provider === 'github') {
-      button.innerHTML = `
-        <img src="https://res.cloudinary.com/dtvyar9as/image/upload/v1756950613/github-logo_l0mgoo.png" alt="GitHub logo">
-        Continue with GitHub
-      `;
-    }
-  });
-}
-
-// Listen for when the user comes back
-window.addEventListener('focus', resetOAuthButtons);
