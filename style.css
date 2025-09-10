@@ -737,14 +737,14 @@ gap: var(--space-20);
     left: 2px;
     width: 30px;
     height: 30px;
-    background-color: var(--color-white); /* Light mode thumb */
+    background-color: var(--color-white); /* Light mode switch */
     border-radius: 50%;
     transition: transform 0.4s, background-color 0.4s, box-shadow 0.4s;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 /* Checked state (Dark Mode) */
-.theme-toggle_switch:checked + .theme-toggle_label::after {
+.theme-toggle__switch:checked + .theme-toggle__label::after {
     transform: translateX(26px); /* Move switch to the right */
 }
 
