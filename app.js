@@ -361,6 +361,7 @@ function setupEventListeners() {
     if (e.key === 'Escape') {
       closeBookingModal();
       closeLoginModal();
+      closeBookingHistoryModal();
     }
   });
 
@@ -417,12 +418,12 @@ function setupLoginModalEvents() {
   if (modalClose) modalClose.addEventListener('click', closeLoginModal);
   if (modalOverlay) modalOverlay.addEventListener('click', closeLoginModal);
 
-  const loginForm = document.getElementById('login-form');
+  const loginForm = document.getElementById('email-login-form');
   if (loginForm) {
     loginForm.addEventListener('submit', handleEmailLogin);
   }
   
-  const registerForm = document.getElementById('register-form');
+  const registerForm = document.getElementById('email-register-form');
   if (registerForm) {
     registerForm.addEventListener('submit', handleEmailRegister);
   }
@@ -478,6 +479,7 @@ function setupLoginModalEvents() {
 function openLoginModal() {
   const loginModal = document.getElementById('login-modal');
   if (loginModal) {
+    loginModal.classList.remove('hidden');
     loginModal.classList.add('visible');
     document.body.style.overflow = 'hidden';
   }
@@ -487,6 +489,7 @@ function closeLoginModal() {
   const loginModal = document.getElementById('login-modal');
   if (loginModal) {
     loginModal.classList.remove('visible');
+    loginModal.classList.add('hidden');
     document.body.style.overflow = 'auto';
   }
 }
@@ -650,23 +653,25 @@ function openBookingModal(name, price) {
 
 function closeBookingModal() {
   const modal = document.getElementById('booking-modal');
-  modal.classList.remove('visible');
-  modal.classList.add('hidden');
-  
-  // Clear form and status messages
-  const form = document.getElementById('booking-form');
-  if (form) {
-    form.reset();
+  if (modal) {
+    modal.classList.remove('visible');
+    modal.classList.add('hidden');
+    
+    // Clear form and status messages
+    const form = document.getElementById('booking-form');
+    if (form) {
+      form.reset();
+    }
+    
+    const formStatus = document.getElementById('form-status');
+    if (formStatus) {
+      formStatus.textContent = '';
+      formStatus.style.color = '';
+    }
+    
+    document.body.style.overflow = 'auto';
+    currentSelectedCar = null;
   }
-  
-  const formStatus = document.getElementById('form-status');
-  if (formStatus) {
-    formStatus.textContent = '';
-    formStatus.style.color = '';
-  }
-  
-  document.body.style.overflow = 'auto';
-  currentSelectedCar = null;
 }
 
 // UPDATE BOOKING TOTAL
@@ -953,7 +958,7 @@ function renderBookingHistory(bookings) {
                     </div>
                 ` : ''}
                 <div class="booking-detail booking-amount">
-                    <strong>Total Amount: ₹${booking.total_amount}</strong>
+                    <strong>Total Amount: ₹${booking.total_amount.toLocaleString()}</strong>
                 </div>
             </div>
         </div>
@@ -980,8 +985,9 @@ async function showBookingHistory() {
         return;
     }
     
-    modal.style.display = 'block';
-    document.body.classList.add('modal-open');
+    modal.classList.remove('hidden');
+    modal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
     
     contentDiv.innerHTML = '<div class="loading-container"><div class="loading-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="loading-text">Loading your bookings...</div></div>';
     
@@ -1002,8 +1008,9 @@ async function showBookingHistory() {
 function closeBookingHistoryModal() {
     const modal = document.getElementById('booking-history-modal');
     if (modal) {
-        modal.style.display = 'none';
-        document.body.classList.remove('modal-open');
+        modal.classList.remove('visible');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
     }
 }
 
