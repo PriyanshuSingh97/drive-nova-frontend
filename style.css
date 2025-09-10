@@ -2540,6 +2540,7 @@ border: 2px solid var(--color-border);
     max-height: 500px;
     overflow-y: auto;
     margin-top: var(--space-20);
+    padding: var(--space-20);
 }
 
 .booking-item {
@@ -2608,10 +2609,6 @@ border: 2px solid var(--color-border);
     color: var(--color-error);
 }
 
-.nav__booking-history {
-    display: none;
-}
-
 @media (max-width: 768px) {
     .booking-item__header {
         flex-direction: column;
@@ -2623,3 +2620,4 @@ border: 2px solid var(--color-border);
         font-size: var(--font-size-sm);
     }
 }
+

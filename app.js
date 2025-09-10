@@ -57,7 +57,9 @@ function renderAuthButtons() {
     desktopLoginLi.appendChild(logoutBtn);
     
     // Show booking history button
-    if (desktopBookingHistoryLi) desktopBookingHistoryLi.style.display = 'list-item';
+    if (desktopBookingHistoryLi) {
+        desktopBookingHistoryLi.style.display = 'list-item';
+    }
   } else {
     const loginBtn = document.createElement('button');
     loginBtn.textContent = 'Login/Signup';
@@ -66,7 +68,9 @@ function renderAuthButtons() {
     desktopLoginLi.appendChild(loginBtn);
     
     // Hide booking history button
-    if (desktopBookingHistoryLi) desktopBookingHistoryLi.style.display = 'none';
+    if (desktopBookingHistoryLi) {
+        desktopBookingHistoryLi.style.display = 'none';
+    }
   }
 }
 
@@ -84,13 +88,14 @@ function renderMobileAuthButton() {
     logoutBtn.className = 'btn btn--primary btn-nav-login mobile-login';
     logoutBtn.onclick = function () {
       logout();
-      document.getElementById('nav-menu-mobile').classList.remove('active');
-      document.getElementById('nav-hamburger').classList.remove('active');
+      closeMobileNav();
     };
     mobileLoginLi.appendChild(logoutBtn);
     
     // Show booking history button
-    if (mobileBookingHistoryLi) mobileBookingHistoryLi.style.display = 'list-item';
+    if (mobileBookingHistoryLi) {
+        mobileBookingHistoryLi.style.display = 'list-item';
+    }
   } else {
     const loginBtn = document.createElement('button');
     loginBtn.textContent = 'Login/Signup';
@@ -99,7 +104,9 @@ function renderMobileAuthButton() {
     mobileLoginLi.appendChild(loginBtn);
     
     // Hide booking history button
-    if (mobileBookingHistoryLi) mobileBookingHistoryLi.style.display = 'none';
+    if (mobileBookingHistoryLi) {
+        mobileBookingHistoryLi.style.display = 'none';
+    }
   }
 }
 
@@ -968,10 +975,15 @@ async function showBookingHistory() {
     const modal = document.getElementById('booking-history-modal');
     const contentDiv = document.getElementById('booking-history-content');
     
+    if (!modal) {
+        console.error('Booking history modal not found in DOM');
+        return;
+    }
+    
     modal.style.display = 'block';
     document.body.classList.add('modal-open');
     
-    contentDiv.innerHTML = '<div class="loading-spinner">Loading your bookings...</div>';
+    contentDiv.innerHTML = '<div class="loading-container"><div class="loading-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="loading-text">Loading your bookings...</div></div>';
     
     try {
         const bookings = await fetchBookingHistory();
@@ -989,6 +1001,15 @@ async function showBookingHistory() {
 
 function closeBookingHistoryModal() {
     const modal = document.getElementById('booking-history-modal');
-    modal.style.display = 'none';
-    document.body.classList.remove('modal-open');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function closeMobileNav() {
+    const mobileNav = document.getElementById('nav-menu-mobile');
+    const hamburger = document.getElementById('nav-hamburger');
+    if (mobileNav) mobileNav.classList.remove('active');
+    if (hamburger) hamburger.classList.remove('active');
 }

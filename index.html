@@ -31,7 +31,9 @@
         <li class="nav__item"><a href="#fleet" class="nav__link">Fleet</a></li>
         <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
         <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
-        <li class="nav__item nav__booking-history" style="display: none;" id="nav-menu-desktop-booking-history"><a href="#" onclick="showBookingHistory(); return false;" class="nav__link">Booking History</a></li>
+        <li class="nav__item" style="display: none;" id="nav-menu-desktop-booking-history">
+            <a href="javascript:void(0);" onclick="showBookingHistory()" class="nav__link">Booking History</a>
+        </li>
         <li class="nav__item" id="nav-menu-desktop-login"></li>
       </ul>
       <!-- Desktop Theme Toggle -->
@@ -52,7 +54,9 @@
         <li class="nav__item"><a href="#fleet" class="nav__link">Fleet</a></li>
         <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
         <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
-        <li class="nav__item nav__booking-history" style="display: none;" id="nav-menu-mobile-booking-history"><a href="#" onclick="showBookingHistory(); closeMobileNav(); return false;" class="nav__link">Booking History</a></li>
+        <li class="nav__item" style="display: none;" id="nav-menu-mobile-booking-history">
+            <a href="javascript:void(0);" onclick="showBookingHistory(); closeMobileNav();" class="nav__link">Booking History</a>
+        </li>
 
         <!-- Mobile Login / Logout Button -->
         <li class="nav__item" id="nav-menu-mobile-login"></li>
@@ -317,11 +321,14 @@
 
 <!-- Booking History Modal -->
 <div id="booking-history-modal" class="modal" style="display: none;">
+    <div class="modal__overlay" onclick="closeBookingHistoryModal()"></div>
     <div class="modal__content modal__content--wide">
-        <span class="modal__close" onclick="closeBookingHistoryModal()">&times;</span>
-        <h2>Your Booking History</h2>
+        <div class="modal__header">
+            <h2>Your Booking History</h2>
+            <span class="modal__close" onclick="closeBookingHistoryModal()">&times;</span>
+        </div>
         <div id="booking-history-content">
-            <div class="loading-spinner">Loading your bookings...</div>
+            Loading...
         </div>
     </div>
 </div>
