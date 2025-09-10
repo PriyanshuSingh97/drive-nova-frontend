@@ -457,6 +457,20 @@ function openLoginModal() {
   if (loginModal) {
     loginModal.classList.add('visible');
     document.body.style.overflow = 'hidden';
+
+    // Reset Google/GitHub login buttons if they were disabled
+    ['google-login-login', 'google-login-register', 'github-login-login', 'github-login-register']
+      .forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.disabled = false;
+          // Restore original text if stored, otherwise leave as-is
+          if (!btn.getAttribute('data-original-text')) {
+            btn.setAttribute('data-original-text', btn.innerHTML.trim());
+          }
+          btn.innerHTML = btn.getAttribute('data-original-text');
+        }
+      });
   }
 }
 
@@ -467,6 +481,7 @@ function closeLoginModal() {
     document.body.style.overflow = 'auto';
   }
 }
+
 
 // BOOKING FORM SUBMIT
 async function handleBookingSubmit(e) {
