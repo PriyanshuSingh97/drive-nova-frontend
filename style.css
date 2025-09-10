@@ -2530,3 +2530,96 @@ border: 2px solid var(--color-border);
 .btn .spinner div:nth-child(11) { transform: rotate(300deg); animation-delay: -0.1s; }
 .btn .spinner div:nth-child(12) { transform: rotate(330deg); animation-delay: 0s; }
 
+/* Booking History Modal Styles */
+.modal__content--wide {
+    max-width: 800px;
+    width: 90%;
+}
+
+.booking-history-list {
+    max-height: 500px;
+    overflow-y: auto;
+    margin-top: var(--space-20);
+}
+
+.booking-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+    padding: var(--space-20);
+    margin-bottom: var(--space-16);
+    background: var(--color-surface);
+}
+
+.booking-item__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-16);
+    padding-bottom: var(--space-12);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.booking-item__header h3 {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: var(--font-size-lg);
+}
+
+.booking-item__date {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.booking-item__details {
+    display: grid;
+    gap: var(--space-8);
+}
+
+.booking-detail {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-base);
+}
+
+.booking-detail strong {
+    color: var(--color-text);
+}
+
+.booking-amount {
+    margin-top: var(--space-8);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+}
+
+.booking-amount strong {
+    color: var(--color-primary);
+    font-size: var(--font-size-lg);
+}
+
+.no-bookings {
+    text-align: center;
+    padding: var(--space-32);
+    color: var(--color-text-secondary);
+}
+
+.error-message {
+    text-align: center;
+    padding: var(--space-32);
+    color: var(--color-error);
+}
+
+.nav__booking-history {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .booking-item__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-8);
+    }
+    
+    .booking-item__details {
+        font-size: var(--font-size-sm);
+    }
+}

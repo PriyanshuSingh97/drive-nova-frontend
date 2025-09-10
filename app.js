@@ -44,6 +44,8 @@ function createButtonSpinner() {
 // RENDERING AUTH BUTTONS DESKTOP
 function renderAuthButtons() {
   const desktopLoginLi = document.getElementById('nav-menu-desktop-login');
+  const desktopBookingHistoryLi = document.getElementById('nav-menu-desktop-booking-history');
+  
   if (!desktopLoginLi) return;
   desktopLoginLi.innerHTML = '';
 
@@ -53,18 +55,26 @@ function renderAuthButtons() {
     logoutBtn.className = 'btn btn--primary btn-nav-login';
     logoutBtn.onclick = logout;
     desktopLoginLi.appendChild(logoutBtn);
+    
+    // Show booking history button
+    if (desktopBookingHistoryLi) desktopBookingHistoryLi.style.display = 'list-item';
   } else {
     const loginBtn = document.createElement('button');
     loginBtn.textContent = 'Login/Signup';
     loginBtn.className = 'btn btn--primary btn-nav-login';
     loginBtn.onclick = openLoginModal;
     desktopLoginLi.appendChild(loginBtn);
+    
+    // Hide booking history button
+    if (desktopBookingHistoryLi) desktopBookingHistoryLi.style.display = 'none';
   }
 }
 
 // RENDERING AUTH BUTTONS MOBILE
 function renderMobileAuthButton() {
   const mobileLoginLi = document.getElementById('nav-menu-mobile-login');
+  const mobileBookingHistoryLi = document.getElementById('nav-menu-mobile-booking-history');
+  
   if (!mobileLoginLi) return;
   mobileLoginLi.innerHTML = '';
 
@@ -78,12 +88,18 @@ function renderMobileAuthButton() {
       document.getElementById('nav-hamburger').classList.remove('active');
     };
     mobileLoginLi.appendChild(logoutBtn);
+    
+    // Show booking history button
+    if (mobileBookingHistoryLi) mobileBookingHistoryLi.style.display = 'list-item';
   } else {
     const loginBtn = document.createElement('button');
     loginBtn.textContent = 'Login/Signup';
     loginBtn.className = 'btn btn--primary btn-nav-login mobile-login';
     loginBtn.onclick = openLoginModal;
     mobileLoginLi.appendChild(loginBtn);
+    
+    // Hide booking history button
+    if (mobileBookingHistoryLi) mobileBookingHistoryLi.style.display = 'none';
   }
 }
 
@@ -864,3 +880,115 @@ function setupSmoothScroll() {
   });
 }
 
+// Booking History Functions
+async function fetchBookingHistory() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/bookings/user`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                ...authHeaders()
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const bookings = await response.json();
+        return bookings;
+    } catch (error) {
+        console.error('Error fetching booking history:', error);
+        throw error;
+    }
+}
+
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+
+function renderBookingHistory(bookings) {
+    const contentDiv = document.getElementById('booking-history-content');
+    
+    if (!bookings || bookings.length === 0) {
+        contentDiv.innerHTML = `
+            <div class="no-bookings">
+                <p>No bookings found.</p>
+                <p>Start exploring our cars and make your first booking!</p>
+            </div>
+        `;
+        return;
+    }
+
+    const bookingsHtml = bookings.map(booking => `
+        <div class="booking-item">
+            <div class="booking-item__header">
+                <h3>${booking.car_model}</h3>
+                <span class="booking-item__date">${formatDate(booking.createdAt)}</span>
+            </div>
+            <div class="booking-item__details">
+                <div class="booking-detail">
+                    <strong>Pickup:</strong> ${booking.pickup_location} - ${formatDate(booking.pickup_date)}
+                </div>
+                <div class="booking-detail">
+                    <strong>Drop-off:</strong> ${booking.dropoff_location} - ${formatDate(booking.dropoff_date)}
+                </div>
+                <div class="booking-detail">
+                    <strong>Contact:</strong> ${booking.name} (${booking.phone})
+                </div>
+                ${booking.services && booking.services.length > 0 ? `
+                    <div class="booking-detail">
+                        <strong>Services:</strong> ${booking.services.join(', ')}
+                    </div>
+                ` : ''}
+                <div class="booking-detail booking-amount">
+                    <strong>Total Amount: ₹${booking.total_amount}</strong>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    contentDiv.innerHTML = `
+        <div class="booking-history-list">
+            ${bookingsHtml}
+        </div>
+    `;
+}
+
+async function showBookingHistory() {
+    if (!isUserLoggedIn()) {
+        showPopupMessage('Please login to view your booking history.', 'error');
+        return;
+    }
+
+    const modal = document.getElementById('booking-history-modal');
+    const contentDiv = document.getElementById('booking-history-content');
+    
+    modal.style.display = 'block';
+    document.body.classList.add('modal-open');
+    
+    contentDiv.innerHTML = '<div class="loading-spinner">Loading your bookings...</div>';
+    
+    try {
+        const bookings = await fetchBookingHistory();
+        renderBookingHistory(bookings);
+    } catch (error) {
+        contentDiv.innerHTML = `
+            <div class="error-message">
+                <p>Failed to load booking history.</p>
+                <button class="btn btn--secondary" onclick="showBookingHistory()">Try Again</button>
+            </div>
+        `;
+        showPopupMessage('Failed to load booking history.', 'error');
+    }
+}
+
+function closeBookingHistoryModal() {
+    const modal = document.getElementById('booking-history-modal');
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+}
